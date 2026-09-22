@@ -2,1900 +2,2169 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0a0a0a">
-<title>Gym CRM</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="manifest" href='data:application/manifest+json,{"name":"Gym CRM","short_name":"Gym CRM","start_url":"./","display":"standalone","background_color":"%230a0a0a","theme_color":"%230a0a0a","icons":[{"src":"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Crect width=%27100%27 height=%27100%27 rx=%2720%27 fill=%27%23fff%27/%3E%3Ctext x=%2750%27 y=%2768%27 font-size=%2760%27 font-weight=%27800%27 text-anchor=%27middle%27 fill=%27%23000%27%3EG%3C/text%3E%3C/svg%3E","sizes":"192x192","type":"image/svg+xml"}]}'>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VelvetNet Gym CRM</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-/* ============================================================
-   RESET & VARIABLES
-   ============================================================ */
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-:root {
-  --bg: #0a0a0a;
-  --bg-elev: #121212;
-  --bg-card: #161616;
-  --bg-card-hover: #1c1c1c;
-  --bg-input: #0f0f0f;
-  --border: #242424;
-  --border-strong: #2f2f2f;
-  --text: #f5f5f5;
-  --text-dim: #9a9a9a;
-  --text-muted: #6a6a6a;
-  --success: #22c55e;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --info: #3b82f6;
-  --radius: 14px;
-  --radius-sm: 10px;
-  --shadow: 0 8px 24px rgba(0,0,0,.5);
-  --shadow-lg: 0 20px 60px rgba(0,0,0,.6);
-  --transition: .18s cubic-bezier(.4,0,.2,1);
-  --sidebar-w: 250px;
+/* ============================================
+   RESET & BASE
+   ============================================ */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --sidebar-bg:#111827;
+  --sidebar-hover:#1f2937;
+  --accent:#10b981;
+  --accent-dark:#059669;
+  --accent-light:#d1fae5;
+  --text:#111827;
+  --text-muted:#6b7280;
+  --border:#e5e7eb;
+  --bg:#f9fafb;
+  --white:#ffffff;
+  --danger:#ef4444;
+  --warning:#f59e0b;
+  --info:#3b82f6;
+  --radius:10px;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --shadow-lg:0 10px 25px rgba(0,0,0,.08);
 }
-html, body { height:100%; }
-body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background: var(--bg);
-  color: var(--text);
-  font-size: 14px;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+html,body{height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;
 }
-button, input, select, textarea { font: inherit; color: inherit; }
-button { cursor: pointer; border: none; background: none; }
-::selection { background: #fff; color: #000; }
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+input,select,textarea{font-family:inherit;font-size:14px}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
 
-::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 4px; }
-::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
-
-/* ============================================================
-   UTILITY
-   ============================================================ */
-.hidden { display:none !important; }
-.flex { display:flex; }
-.items-center { align-items:center; }
-.justify-between { justify-content:space-between; }
-.gap-1 { gap:.5rem; }
-.gap-2 { gap:1rem; }
-.gap-3 { gap:1.5rem; }
-.flex-wrap { flex-wrap:wrap; }
-.mt-1 { margin-top:.5rem; }
-.mt-2 { margin-top:1rem; }
-.mt-3 { margin-top:1.5rem; }
-.mb-1 { margin-bottom:.5rem; }
-.mb-2 { margin-bottom:1rem; }
-.mb-3 { margin-bottom:1.5rem; }
-.text-dim { color: var(--text-dim); }
-.text-muted { color: var(--text-muted); }
-.text-sm { font-size:.8rem; }
-.text-xs { font-size:.72rem; }
-.font-600 { font-weight:600; }
-.w-full { width:100%; }
-
-/* ============================================================
+/* ============================================
    LAYOUT
-   ============================================================ */
-#app { display: flex; min-height: 100vh; }
-.sidebar {
-  width: var(--sidebar-w);
-  background: var(--bg-elev);
-  border-right: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  position: fixed;
-  top: 0; left: 0; bottom: 0;
-  z-index: 50;
-  transition: transform .3s cubic-bezier(.4,0,.2,1);
+   ============================================ */
+.app{display:flex;min-height:100vh}
+.sidebar{
+  width:240px;background:var(--sidebar-bg);color:#fff;display:flex;
+  flex-direction:column;position:fixed;height:100vh;z-index:100;
+  transition:transform .25s ease;
 }
-.sidebar-header {
-  padding: 1.5rem 1.25rem;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  gap: .75rem;
+.main{
+  flex:1;margin-left:240px;display:flex;flex-direction:column;min-height:100vh;
 }
-.sidebar-logo {
-  width: 36px; height: 36px;
-  background: #fff; color: #000;
-  border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 800;
-  flex-shrink: 0;
+.topbar{
+  background:var(--white);border-bottom:1px solid var(--border);
+  padding:14px 24px;display:flex;align-items:center;justify-content:space-between;
+  position:sticky;top:0;z-index:50;
 }
-.sidebar-title { font-size: .95rem; font-weight: 700; letter-spacing: -.02em; }
-.sidebar-sub { font-size: .7rem; color: var(--text-muted); margin-top: 1px; }
-.nav { flex: 1; overflow-y: auto; padding: 1rem .75rem; display: flex; flex-direction: column; gap: .15rem; }
-.nav-item {
-  display: flex; align-items: center; gap: .75rem;
-  padding: .65rem .75rem;
-  border-radius: var(--radius-sm);
-  color: var(--text-dim);
-  font-weight: 500;
-  font-size: .875rem;
-  transition: var(--transition);
-  text-align: left;
-  width: 100%;
-}
-.nav-item:hover { background: rgba(255,255,255,.03); color: var(--text); }
-.nav-item.active { background: rgba(255,255,255,.06); color: var(--text); font-weight: 600; }
-.nav-item svg { flex-shrink: 0; }
-.sidebar-footer { padding: 1rem .75rem; border-top: 1px solid var(--border); text-align: center; font-size: .7rem; color: var(--text-muted); }
+.topbar h2{font-size:18px;font-weight:600}
+.content{padding:24px;flex:1}
 
-.main {
-  flex: 1;
-  margin-left: var(--sidebar-w);
-  padding: 2rem 2.5rem 4rem;
-  min-width: 0;
-  max-width: 100%;
+/* ============================================
+   SIDEBAR
+   ============================================ */
+.sidebar-brand{
+  padding:20px;border-bottom:1px solid rgba(255,255,255,.08);
+  display:flex;align-items:center;gap:10px;
+}
+.sidebar-brand .logo{
+  width:34px;height:34px;background:var(--accent);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;
+}
+.sidebar-brand span{font-weight:600;font-size:15px}
+.nav{flex:1;padding:12px 8px;overflow-y:auto}
+.nav-item{
+  display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;
+  color:#9ca3af;font-size:14px;font-weight:500;width:100%;text-align:left;
+  transition:background .15s,color .15s;margin-bottom:2px;
+}
+.nav-item:hover{background:var(--sidebar-hover);color:#fff}
+.nav-item.active{background:var(--accent);color:#fff}
+.nav-item svg{width:18px;height:18px;flex-shrink:0}
+.sidebar-footer{padding:12px 8px;border-top:1px solid rgba(255,255,255,.08)}
+.sidebar-footer .user{
+  padding:10px 14px;color:#9ca3af;font-size:12px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
 }
 
-/* ============================================================
-   PAGE HEADER
-   ============================================================ */
-.page-head {
-  display: flex; justify-content: space-between; align-items: flex-start;
-  gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;
+/* ============================================
+   CARDS & COMPONENTS
+   ============================================ */
+.card{
+  background:var(--white);border-radius:var(--radius);border:1px solid var(--border);
+  box-shadow:var(--shadow);
 }
-.page-title { font-size: 1.75rem; font-weight: 700; letter-spacing: -.03em; }
-.page-sub { color: var(--text-dim); font-size: .875rem; margin-top: .25rem; }
-.page-actions { display: flex; gap: .5rem; flex-wrap: wrap; }
+.card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;
+  align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.card-header h3{font-size:15px;font-weight:600}
+.card-body{padding:20px}
 
-/* ============================================================
-   CARDS & STATS
-   ============================================================ */
-.card {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1.25rem;
+.stats-grid{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:16px;margin-bottom:24px;
 }
-.card-title { font-size: 1rem; font-weight: 600; margin-bottom: .25rem; }
-.card-sub { font-size: .8rem; color: var(--text-muted); }
+.stat-card{
+  background:var(--white);border-radius:var(--radius);border:1px solid var(--border);
+  padding:18px;box-shadow:var(--shadow);
+}
+.stat-card .label{font-size:12px;color:var(--text-muted);font-weight:500;
+  text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.stat-card .value{font-size:26px;font-weight:700;color:var(--text)}
+.stat-card .value.green{color:var(--accent)}
+.stat-card .value.red{color:var(--danger)}
+.stat-card .value.orange{color:var(--warning)}
+.stat-card .value.blue{color:var(--info)}
+.stat-card .sub{font-size:12px;color:var(--text-muted);margin-top:4px}
 
-.stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-.stat {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 1.15rem 1.25rem;
-  transition: var(--transition);
-}
-.stat:hover { border-color: var(--border-strong); background: var(--bg-card-hover); }
-.stat-label { font-size: .72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .06em; font-weight: 600; margin-bottom: .5rem; }
-.stat-value { font-size: 1.85rem; font-weight: 700; letter-spacing: -.03em; line-height: 1.1; }
-
-.quick-actions {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: .75rem;
-  margin-bottom: 2rem;
-}
-.qa-btn {
-  display: flex; align-items: center; gap: .75rem;
-  padding: 1rem 1.15rem;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  transition: var(--transition);
-  text-align: left;
-  font-weight: 500;
-  color: var(--text);
-}
-.qa-btn:hover { background: var(--bg-card-hover); border-color: var(--border-strong); transform: translateY(-1px); }
-.qa-icon {
-  width: 36px; height: 36px;
-  background: rgba(255,255,255,.06);
-  border-radius: 10px;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-
-.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-bottom: 2rem; }
-@media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
-
-/* ============================================================
-   TABLES
-   ============================================================ */
-.table-wrap {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  overflow: hidden;
-}
-.table-head {
-  padding: 1.15rem 1.25rem;
-  border-bottom: 1px solid var(--border);
-  display: flex; justify-content: space-between; align-items: center;
-  gap: 1rem;
-}
-.table-scroll { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; font-size: .875rem; }
-thead th {
-  text-align: left;
-  padding: .85rem 1.25rem;
-  font-size: .72rem;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: .06em;
-  background: rgba(255,255,255,.01);
-  border-bottom: 1px solid var(--border);
-  white-space: nowrap;
-}
-tbody td { padding: .9rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,.03); vertical-align: middle; }
-tbody tr:last-child td { border-bottom: none; }
-tbody tr { transition: background .12s; }
-tbody tr:hover { background: rgba(255,255,255,.02); }
-
-.badge {
-  display: inline-flex; align-items: center; gap: .35rem;
-  padding: .25rem .6rem;
-  border-radius: 20px;
-  font-size: .72rem;
-  font-weight: 600;
-  background: rgba(255,255,255,.06);
-  color: var(--text-dim);
-  border: 1px solid rgba(255,255,255,.06);
-  white-space: nowrap;
-}
-.badge::before { content:''; width:5px; height:5px; border-radius:50%; background: currentColor; }
-.badge-success { color: #4ade80; background: rgba(34,197,94,.1); border-color: rgba(34,197,94,.2); }
-.badge-warning { color: #fbbf24; background: rgba(245,158,11,.1); border-color: rgba(245,158,11,.2); }
-.badge-danger  { color: #f87171; background: rgba(239,68,68,.1); border-color: rgba(239,68,68,.2); }
-
-.toolbar {
-  display: flex; gap: .5rem; flex-wrap: wrap; align-items: center;
-  margin-bottom: 1.25rem;
-}
-.toolbar .input { max-width: 320px; }
-.toolbar select { width: auto; min-width: 140px; }
-
-/* ============================================================
-   FORM CONTROLS
-   ============================================================ */
-.field { margin-bottom: 1rem; }
-.field label {
-  display: block;
-  font-size: .78rem;
-  font-weight: 500;
-  color: var(--text-dim);
-  margin-bottom: .4rem;
-  text-transform: uppercase;
-  letter-spacing: .04em;
-}
-input[type="text"], input[type="password"], input[type="email"],
-input[type="tel"], input[type="number"], input[type="date"], input[type="time"],
-select, textarea, .input {
-  width: 100%;
-  background: var(--bg-input);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-sm);
-  padding: .75rem 1rem;
-  font-size: .9rem;
-  transition: var(--transition);
-  outline: none;
-}
-input:focus, select:focus, textarea:focus {
-  border-color: #444;
-  background: #141414;
-  box-shadow: 0 0 0 3px rgba(255,255,255,.04);
-}
-input::placeholder, textarea::placeholder { color: var(--text-muted); }
-select {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239a9a9a' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 1rem center;
-  padding-right: 2.5rem;
-}
-textarea { resize: vertical; min-height: 70px; }
-
-/* ============================================================
+/* ============================================
    BUTTONS
-   ============================================================ */
-.btn {
-  display: inline-flex; align-items: center; justify-content: center;
-  gap: .5rem;
-  padding: .7rem 1.25rem;
-  border-radius: var(--radius-sm);
-  font-size: .88rem;
-  font-weight: 500;
-  border: 1px solid var(--border);
-  background: var(--bg-card);
-  color: var(--text);
-  transition: var(--transition);
-  white-space: nowrap;
-  line-height: 1;
+   ============================================ */
+.btn{
+  display:inline-flex;align-items:center;gap:6px;padding:9px 16px;
+  border-radius:8px;font-size:13px;font-weight:600;transition:all .15s;
+  white-space:nowrap;
 }
-.btn:hover { background: var(--bg-card-hover); border-color: var(--border-strong); }
-.btn:active { transform: scale(.98); }
-.btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
-.btn-primary { background: #fff; color: #000; border-color: #fff; font-weight: 600; }
-.btn-primary:hover { background: #e5e5e5; border-color: #e5e5e5; }
-.btn-danger { background: rgba(239,68,68,.1); color: #fca5a5; border-color: rgba(239,68,68,.3); }
-.btn-danger:hover { background: rgba(239,68,68,.18); }
-.btn-ghost { background: transparent; border-color: transparent; color: var(--text-dim); }
-.btn-ghost:hover { background: var(--bg-card); color: var(--text); }
-.btn-sm { padding: .45rem .8rem; font-size: .8rem; border-radius: 8px; }
-.btn-icon { padding: .5rem; width: 32px; height: 32px; }
+.btn:disabled{opacity:.6;cursor:not-allowed}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover:not(:disabled){background:var(--accent-dark)}
+.btn-secondary{background:var(--white);color:var(--text);border:1px solid var(--border)}
+.btn-secondary:hover:not(:disabled){background:var(--bg)}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-danger:hover:not(:disabled){background:#dc2626}
+.btn-warning{background:var(--warning);color:#fff}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-icon{padding:7px;border-radius:6px}
 
-/* ============================================================
+/* ============================================
+   FORMS
+   ============================================ */
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group.full{grid-column:1/-1}
+.form-group label{font-size:13px;font-weight:600;color:var(--text)}
+.form-group input,.form-group select,.form-group textarea{
+  padding:10px 12px;border:1px solid var(--border);border-radius:8px;
+  background:var(--white);transition:border .15s,box-shadow .15s;
+}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{
+  outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(16,185,129,.1);
+}
+.form-group textarea{resize:vertical;min-height:70px}
+.form-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;
+  padding-top:20px;border-top:1px solid var(--border)}
+
+/* ============================================
+   TABLES
+   ============================================ */
+.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{
+  text-align:left;padding:11px 14px;font-weight:600;color:var(--text-muted);
+  font-size:11px;text-transform:uppercase;letter-spacing:.5px;
+  border-bottom:1px solid var(--border);background:var(--bg);white-space:nowrap;
+}
+td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+tbody tr:hover{background:#fafafa}
+tbody tr:last-child td{border-bottom:none}
+
+.badge{
+  display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;
+  font-weight:600;white-space:nowrap;
+}
+.badge-active{background:var(--accent-light);color:#065f46}
+.badge-expired{background:#fee2e2;color:#991b1b}
+.badge-soon{background:#fef3c7;color:#92400e}
+.badge-info{background:#dbeafe;color:#1e40af}
+.badge-gray{background:#f3f4f6;color:#4b5563}
+
+/* ============================================
+   TOOLBAR
+   ============================================ */
+.toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+.search-box{position:relative;flex:1;min-width:200px;max-width:380px}
+.search-box input{width:100%;padding:10px 12px 10px 36px;border:1px solid var(--border);
+  border-radius:8px;background:var(--white)}
+.search-box input:focus{outline:none;border-color:var(--accent)}
+.search-box svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);
+  width:16px;height:16px;color:var(--text-muted)}
+.filter-tabs{display:flex;gap:4px;background:var(--white);border:1px solid var(--border);
+  border-radius:8px;padding:3px}
+.filter-tabs button{padding:7px 13px;border-radius:6px;font-size:12px;font-weight:600;
+  color:var(--text-muted)}
+.filter-tabs button.active{background:var(--accent);color:#fff}
+
+/* ============================================
    MODAL
-   ============================================================ */
-.modal-overlay {
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,.7);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  display: flex; align-items: center; justify-content: center;
-  padding: 1rem; z-index: 1000;
-  animation: fadeIn .2s ease;
+   ============================================ */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;
+  display:none;align-items:flex-start;justify-content:center;padding:40px 16px;
+  overflow-y:auto;
 }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-.modal {
-  background: var(--bg-elev);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  width: 100%;
-  max-width: 620px;
-  max-height: 90vh;
-  display: flex; flex-direction: column;
-  box-shadow: var(--shadow-lg);
-  animation: modalIn .25s cubic-bezier(.34,1.56,.64,1);
+.modal-overlay.show{display:flex}
+.modal{
+  background:var(--white);border-radius:var(--radius);width:100%;max-width:640px;
+  box-shadow:var(--shadow-lg);margin:auto 0;
 }
-@keyframes modalIn { from { opacity: 0; transform: scale(.96) translateY(10px); } to { opacity: 1; transform: none; } }
-.modal-head {
-  padding: 1.5rem 1.75rem;
-  border-bottom: 1px solid var(--border);
-  display: flex; justify-content: space-between; align-items: center;
-}
-.modal-title { font-size: 1.15rem; font-weight: 700; letter-spacing: -.02em; }
-.modal-body { padding: 1.75rem; overflow-y: auto; }
-.modal-foot {
-  padding: 1.25rem 1.75rem;
-  border-top: 1px solid var(--border);
-  display: flex; justify-content: flex-end; gap: .5rem;
-}
-.modal-close {
-  width: 32px; height: 32px;
-  border-radius: 8px;
-  display: flex; align-items: center; justify-content: center;
-  color: var(--text-dim);
-  transition: var(--transition);
-}
-.modal-close:hover { background: rgba(255,255,255,.06); color: var(--text); }
+.modal.wide{max-width:800px}
+.modal-header{padding:18px 22px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between}
+.modal-header h3{font-size:16px;font-weight:600}
+.modal-close{font-size:22px;color:var(--text-muted);width:30px;height:30px;
+  border-radius:6px;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{background:var(--bg)}
+.modal-body{padding:22px;max-height:70vh;overflow-y:auto}
+.modal-footer{padding:16px 22px;border-top:1px solid var(--border);
+  display:flex;gap:10px;justify-content:flex-end}
 
-.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-.form-grid .full { grid-column: 1 / -1; }
-@media (max-width: 600px) { .form-grid { grid-template-columns: 1fr; } }
+/* ============================================
+   TOAST
+   ============================================ */
+.toast-container{position:fixed;top:20px;right:20px;z-index:2000;
+  display:flex;flex-direction:column;gap:10px}
+.toast{
+  padding:13px 18px;border-radius:8px;color:#fff;font-size:13px;font-weight:500;
+  box-shadow:var(--shadow-lg);animation:slideIn .25s ease;min-width:260px;
+  display:flex;align-items:center;gap:10px;
+}
+.toast.success{background:var(--accent)}
+.toast.error{background:var(--danger)}
+.toast.info{background:var(--info)}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
 
-/* ============================================================
-   TOASTS
-   ============================================================ */
-#toasts {
-  position: fixed; bottom: 1.5rem; right: 1.5rem;
-  display: flex; flex-direction: column; gap: .5rem;
-  z-index: 2000;
-  pointer-events: none;
-  max-width: 380px;
+/* ============================================
+   LOGIN
+   ============================================ */
+.login-screen{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#111827 0%,#1f2937 100%);padding:20px;
 }
-.toast {
-  background: #1f1f1f;
-  border: 1px solid var(--border-strong);
-  border-left: 3px solid var(--info);
-  padding: .9rem 1.15rem;
-  border-radius: var(--radius-sm);
-  box-shadow: var(--shadow);
-  font-size: .875rem;
-  color: var(--text);
-  pointer-events: auto;
-  animation: toastIn .3s cubic-bezier(.34,1.56,.64,1);
+.login-card{
+  background:var(--white);border-radius:14px;padding:40px 36px;width:100%;
+  max-width:400px;box-shadow:var(--shadow-lg);
 }
-.toast.success { border-left-color: var(--success); }
-.toast.error   { border-left-color: var(--danger); }
-.toast.warning { border-left-color: var(--warning); }
-@keyframes toastIn { from { transform: translateX(110%); opacity: 0; } to { transform: none; opacity: 1; } }
+.login-card .brand{text-align:center;margin-bottom:28px}
+.login-card .brand .logo{
+  width:56px;height:56px;background:var(--accent);border-radius:14px;
+  display:inline-flex;align-items:center;justify-content:center;
+  color:#fff;font-size:26px;font-weight:700;margin-bottom:12px;
+}
+.login-card .brand h1{font-size:22px;font-weight:700}
+.login-card .brand p{color:var(--text-muted);font-size:13px;margin-top:4px}
 
-/* ============================================================
-   LOADING
-   ============================================================ */
-.spinner {
-  width: 18px; height: 18px;
-  border: 2px solid rgba(255,255,255,.15);
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: spin .7s linear infinite;
-  display: inline-block;
+/* ============================================
+   MISC
+   ============================================ */
+.empty-state{text-align:center;padding:50px 20px;color:var(--text-muted)}
+.empty-state svg{width:48px;height:48px;margin-bottom:12px;opacity:.4}
+.spinner{
+  width:16px;height:16px;border:2px solid rgba(255,255,255,.3);
+  border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;
 }
-@keyframes spin { to { transform: rotate(360deg); } }
-.loading-overlay {
-  position: fixed; inset: 0;
-  background: rgba(10,10,10,.7);
-  backdrop-filter: blur(3px);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 1500;
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-overlay{
+  display:flex;align-items:center;justify-content:center;padding:50px;
+  color:var(--text-muted);gap:10px;
 }
-.loading-overlay .spinner { width: 32px; height: 32px; border-width: 3px; }
+.actions-cell{display:flex;gap:4px}
+.section-title{font-size:14px;font-weight:600;margin:20px 0 10px;
+  padding-bottom:8px;border-bottom:1px solid var(--border)}
+.section-title:first-child{margin-top:0}
+.info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.info-item .lbl{font-size:11px;color:var(--text-muted);text-transform:uppercase;
+  letter-spacing:.4px;font-weight:600;margin-bottom:3px}
+.info-item .val{font-size:14px;font-weight:500}
 
-/* ============================================================
-   EMPTY STATE
-   ============================================================ */
-.empty {
-  padding: 3.5rem 1rem;
-  text-align: center;
-  color: var(--text-muted);
-}
-.empty-icon { font-size: 2.5rem; opacity: .3; margin-bottom: .75rem; }
-.empty-title { font-weight: 600; color: var(--text-dim); margin-bottom: .25rem; }
-.empty-sub { font-size: .85rem; }
+.mobile-menu-btn{display:none;background:none;padding:6px;border-radius:6px}
+.mobile-menu-btn svg{width:22px;height:22px}
+.sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99}
 
-/* ============================================================
-   MOBILE
-   ============================================================ */
-.mobile-topbar {
-  display: none;
-  position: sticky; top: 0;
-  background: var(--bg-elev);
-  border-bottom: 1px solid var(--border);
-  padding: .75rem 1rem;
-  z-index: 40;
-  align-items: center;
-  justify-content: space-between;
+/* ============================================
+   RECEIPT
+   ============================================ */
+.receipt{max-width:360px;margin:0 auto;font-family:'Courier New',monospace;
+  padding:20px;background:#fff}
+.receipt h2{text-align:center;font-size:18px;margin-bottom:4px}
+.receipt .center{text-align:center;font-size:12px;color:#555;margin-bottom:14px}
+.receipt hr{border:none;border-top:1px dashed #999;margin:12px 0}
+.receipt-row{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
+.receipt-row.total{font-weight:700;font-size:15px;border-top:1px solid #333;
+  padding-top:8px;margin-top:8px}
+.receipt .thanks{text-align:center;margin-top:18px;font-size:12px;color:#555}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .sidebar-backdrop.show{display:block}
+  .main{margin-left:0}
+  .mobile-menu-btn{display:block}
+  .form-grid{grid-template-columns:1fr}
+  .info-grid{grid-template-columns:1fr}
+  .content{padding:16px}
+  .stats-grid{grid-template-columns:repeat(2,1fr);gap:12px}
+  .stat-card .value{font-size:22px}
 }
-.sidebar-backdrop {
-  display: none;
-  position: fixed; inset: 0;
-  background: rgba(0,0,0,.6);
-  z-index: 45;
+@media(max-width:520px){
+  .stats-grid{grid-template-columns:1fr}
+  .toolbar{flex-direction:column;align-items:stretch}
+  .search-box{max-width:none}
+  .modal-body{padding:16px}
+  .modal-header,.modal-footer{padding:14px 16px}
+  .topbar{padding:12px 16px}
+  .topbar h2{font-size:16px}
 }
-@media (max-width: 900px) {
-  .mobile-topbar { display: flex; }
-  .sidebar { transform: translateX(-100%); }
-  .sidebar.open { transform: translateX(0); box-shadow: 0 0 40px rgba(0,0,0,.8); }
-  .sidebar-backdrop.show { display: block; }
-  .main { margin-left: 0; padding: 1.25rem 1rem 4rem; }
-  .page-title { font-size: 1.4rem; }
-  .stat-value { font-size: 1.5rem; }
-  .modal { max-height: 95vh; }
-  .modal-body { padding: 1.25rem; }
-  .modal-head, .modal-foot { padding: 1.15rem 1.25rem; }
-  #toasts { left: 1rem; right: 1rem; bottom: 1rem; }
-  thead th, tbody td { padding: .75rem .85rem; }
-}
-@media (max-width: 500px) {
-  .stats { grid-template-columns: repeat(2, 1fr); gap: .75rem; }
-  .stat { padding: .9rem 1rem; }
-  .stat-value { font-size: 1.3rem; }
+
+@media print{
+  body *{visibility:hidden}
+  .receipt,.receipt *{visibility:visible}
+  .receipt{position:absolute;left:0;top:0;width:100%}
 }
 </style>
 </head>
 <body>
 
-<!-- ============ APP ============ -->
-<div id="app">
-
-  <!-- Mobile top bar -->
-  <div class="mobile-topbar">
-    <button class="btn btn-ghost btn-icon" id="mobileMenuBtn" aria-label="Menu">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
-    </button>
-    <div class="font-600">Gym CRM</div>
-    <div style="width:32px"></div>
-  </div>
-
-  <!-- Sidebar backdrop -->
-  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
-
-  <!-- Sidebar -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <div class="sidebar-logo">G</div>
-      <div>
-        <div class="sidebar-title" id="brandName">Gym CRM</div>
-        <div class="sidebar-sub">Admin Panel</div>
-      </div>
+<!-- LOGIN SCREEN -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <div class="brand">
+      <div class="logo">V</div>
+      <h1>VelvetNet Gym CRM</h1>
+      <p>Sign in to manage your gym</p>
     </div>
-    <nav class="nav" id="navRoot"></nav>
-    <div class="sidebar-footer">Gym CRM · v1.0</div>
-  </aside>
-
-  <!-- Main -->
-  <main class="main" id="mainRoot"></main>
+    <form id="loginForm">
+      <div class="form-group" style="margin-bottom:14px">
+        <label>Email</label>
+        <input type="email" id="loginEmail" required placeholder="admin@yourgym.com">
+      </div>
+      <div class="form-group" style="margin-bottom:20px">
+        <label>Password</label>
+        <input type="password" id="loginPassword" required placeholder="••••••••">
+      </div>
+      <button type="submit" class="btn btn-primary" id="loginBtn" style="width:100%;justify-content:center">
+        Sign In
+      </button>
+    </form>
+  </div>
 </div>
 
-<div id="toasts"></div>
-<div id="modalRoot"></div>
-<div id="loadingRoot"></div>
+<!-- MAIN APP -->
+<div id="app" class="app" style="display:none">
+  <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="logo">V</div>
+      <span>VelvetNet CRM</span>
+    </div>
+    <nav class="nav" id="navMenu">
+      <button class="nav-item active" data-page="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+        Dashboard
+      </button>
+      <button class="nav-item" data-page="members">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Members
+      </button>
+      <button class="nav-item" data-page="attendance">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><path d="m9 16 2 2 4-4"/></svg>
+        Attendance
+      </button>
+      <button class="nav-item" data-page="payments">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        Payments
+      </button>
+      <button class="nav-item" data-page="memberships">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7h-9M14 17H5M5 7l-3 5 3 5M19 17l3-5-3-5"/></svg>
+        Memberships
+      </button>
+      <button class="nav-item" data-page="expiry">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Expiry
+      </button>
+      <button class="nav-item" data-page="reports">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Reports
+      </button>
+      <button class="nav-item" data-page="settings">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user" id="userEmail"></div>
+      <button class="nav-item" id="logoutBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
+      </button>
+    </div>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:12px">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <h2 id="pageTitle">Dashboard</h2>
+      </div>
+      <div id="topbarActions"></div>
+    </div>
+    <div class="content" id="pageContent"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalBox">
+    <div class="modal-header">
+      <h3 id="modalTitle">Modal</h3>
+      <button class="modal-close" id="modalClose">&times;</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter"></div>
+  </div>
+</div>
+
+<!-- TOASTS -->
+<div class="toast-container" id="toastContainer"></div>
 
 <script>
 /* ============================================================
- *  CONFIG — SET YOUR DEPLOYED APPS SCRIPT URL HERE
- * ============================================================ */
-const API_URL = 'https://script.google.com/macros/s/AKfycbxhagcW9fioC1XlKJ_IUne_o4rbQhFG5_sAXMxAw0J_jpXhscxq3nEvecPb16e51L2bmA/exec';
+   CONFIGURATION — REPLACE THESE WITH YOUR SUPABASE VALUES
+   ============================================================ */
+const SUPABASE_URL = 'https://hdebxhstlahdizsdjcyr.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhkZWJ4aHN0bGFoZGl6c2RqY3lyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwOTM1ODIsImV4cCI6MjEwNTY2OTU4Mn0.OVRm-q0Xk7WCIUXf6y04j5rXAZgRkkDnXQkp4_2AOY0';
 
 /* ============================================================
- *  API LAYER (no auth)
- * ============================================================ */
-const API = (() => {
-  async function call(action, payload = {}) {
-    if (!API_URL || API_URL.includes('PASTE_YOUR')) {
-      return DemoAPI.call(action, payload);
-    }
-    const body = { action, ...payload };
-    try {
-      const res = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-        body: JSON.stringify(body),
-        redirect: 'follow'
-      });
-      return await res.json();
-    } catch (err) {
-      console.error('[API]', action, err);
-      throw new Error(err.message || 'Network error');
-    }
-  }
-
-  return {
-    getAll:        ()            => call('getAll'),
-    getMembers:    ()            => call('getMembers'),
-    addMember:     (data)        => call('addMember', { data }),
-    updateMember:  (id, data)    => call('updateMember', { id, data }),
-    deleteMember:  (id)          => call('deleteMember', { id }),
-
-    getAttendance:    ()         => call('getAttendance'),
-    addAttendance:    (data)     => call('addAttendance', { data }),
-    updateAttendance: (id, data) => call('updateAttendance', { id, data }),
-    deleteAttendance: (id)       => call('deleteAttendance', { id }),
-
-    getPayments:   ()            => call('getPayments'),
-    addPayment:    (data)        => call('addPayment', { data }),
-    updatePayment: (id, data)    => call('updatePayment', { id, data }),
-    deletePayment: (id)          => call('deletePayment', { id }),
-
-    getPackages:   ()            => call('getPackages'),
-    addPackage:    (data)        => call('addPackage', { data }),
-    updatePackage: (id, data)    => call('updatePackage', { id, data }),
-    deletePackage: (id)          => call('deletePackage', { id }),
-
-    getSettings:    ()           => call('getSettings'),
-    updateSettings: (data)       => call('updateSettings', { data })
-  };
-})();
+   SUPABASE CLIENT  (js/supabase.js)
+   ============================================================ */
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /* ============================================================
- *  DEMO API (localStorage fallback when API_URL not set)
- * ============================================================ */
-const DemoAPI = (() => {
-  const K = { M:'gym_members', A:'gym_attendance', P:'gym_payments', K:'gym_packages', S:'gym_settings' };
-  const load = (k, d) => { try { return JSON.parse(localStorage.getItem(k)) || d; } catch(e){ return d; } };
-  const save = (k, v) => localStorage.setItem(k, JSON.stringify(v));
-
-  function seed() {
-    if (load(K.M, []).length) return;
-    const today = new Date().toISOString().slice(0,10);
-    save(K.K, [
-      { id:'pkg1', name:'Monthly',     duration:30,  price:1500,  description:'1 month access',  status:'active' },
-      { id:'pkg2', name:'Quarterly',   duration:90,  price:4000,  description:'3 months access', status:'active' },
-      { id:'pkg3', name:'Half Yearly', duration:180, price:7500,  description:'6 months access', status:'active' },
-      { id:'pkg4', name:'Yearly',      duration:365, price:14000, description:'12 months access',status:'active' }
-    ]);
-    const future = d => new Date(Date.now() + d*864e5).toISOString().slice(0,10);
-    const past = d => new Date(Date.now() - d*864e5).toISOString().slice(0,10);
-    save(K.M, [
-      { id:'m1', name:'Rajesh Kumar', phone:'9876543210', email:'rajesh@example.com', gender:'Male',   dob:'1990-05-15', joiningDate:today, package:'Monthly',     startDate:today, endDate:future(30),  amount:1500,  paid:1500,  pending:0,    emergencyContact:'9876543211', status:'active',  notes:'' },
-      { id:'m2', name:'Priya Sharma', phone:'8765432109', email:'priya@example.com',  gender:'Female', dob:'1995-08-22', joiningDate:today, package:'Quarterly',   startDate:today, endDate:future(90),  amount:4000,  paid:2000,  pending:2000, emergencyContact:'8765432108', status:'active',  notes:'' },
-      { id:'m3', name:'Amit Singh',   phone:'7654321098', email:'amit@example.com',   gender:'Male',   dob:'1988-12-01', joiningDate:today, package:'Half Yearly', startDate:today, endDate:future(180), amount:7500,  paid:7500,  pending:0,    emergencyContact:'7654321097', status:'active',  notes:'' },
-      { id:'m4', name:'Neha Gupta',   phone:'6543210987', email:'neha@example.com',   gender:'Female', dob:'1992-03-10', joiningDate:today, package:'Monthly',     startDate:today, endDate:past(5),     amount:1500,  paid:1500,  pending:0,    emergencyContact:'6543210986', status:'expired', notes:'' },
-      { id:'m5', name:'Vikram Patel', phone:'5432109876', email:'vikram@example.com', gender:'Male',   dob:'1985-07-19', joiningDate:today, package:'Yearly',      startDate:today, endDate:future(365), amount:14000, paid:10000, pending:4000, emergencyContact:'5432109875', status:'active',  notes:'' }
-    ]);
-    save(K.A, [
-      { id:'a1', memberId:'m1', date:today, checkIn:'07:10', checkOut:'09:20' },
-      { id:'a2', memberId:'m2', date:today, checkIn:'07:15', checkOut:'09:25' }
-    ]);
-    save(K.P, [
-      { id:'pay1', memberId:'m1', date:today, amount:1500, method:'Cash', package:'Monthly',   transactionId:'TXN1000', notes:'' },
-      { id:'pay2', memberId:'m2', date:today, amount:2000, method:'UPI',  package:'Quarterly', transactionId:'TXN1001', notes:'' }
-    ]);
-    save(K.S, {
-      gymName:'PowerHouse Gym', address:'123 Fitness Street, Mumbai', phone:'022-12345678',
-      email:'info@powerhousegym.com', whatsapp:'9876543210', currency:'₹',
-      expiryWarningDays:7, openingTime:'06:00', closingTime:'22:00', logo:''
-    });
-  }
-  seed();
-
-  const delay = v => new Promise(r => setTimeout(() => r(v), 120));
-
-  return {
-    call(action, p) {
-      const map = {
-        getAll:      () => ({ success:true, data:{ members:load(K.M,[]), attendance:load(K.A,[]), payments:load(K.P,[]), packages:load(K.K,[]), settings:load(K.S,{}) } }),
-        getMembers:  () => ({ success:true, data:load(K.M,[]) }),
-        getAttendance: () => ({ success:true, data:load(K.A,[]) }),
-        getPayments: () => ({ success:true, data:load(K.P,[]) }),
-        getPackages: () => ({ success:true, data:load(K.K,[]) }),
-        getSettings: () => ({ success:true, data:load(K.S,{}) }),
-        addMember:    () => { const a = load(K.M,[]); a.push(p.data); save(K.M,a); return { success:true, data:p.data }; },
-        updateMember: () => { const a = load(K.M,[]); const i = a.findIndex(x=>x.id===p.id); if(i>=0){a[i]={...a[i],...p.data}; save(K.M,a);} return { success:true }; },
-        deleteMember: () => { save(K.M, load(K.M,[]).filter(x=>x.id!==p.id)); save(K.A, load(K.A,[]).filter(x=>x.memberId!==p.id)); save(K.P, load(K.P,[]).filter(x=>x.memberId!==p.id)); return { success:true }; },
-        addAttendance:    () => { const a = load(K.A,[]); a.push(p.data); save(K.A,a); return { success:true }; },
-        updateAttendance: () => { const a = load(K.A,[]); const i = a.findIndex(x=>x.id===p.id); if(i>=0){a[i]={...a[i],...p.data}; save(K.A,a);} return { success:true }; },
-        deleteAttendance: () => { save(K.A, load(K.A,[]).filter(x=>x.id!==p.id)); return { success:true }; },
-        addPayment:    () => { const a = load(K.P,[]); a.push(p.data); save(K.P,a); return { success:true }; },
-        updatePayment: () => { const a = load(K.P,[]); const i = a.findIndex(x=>x.id===p.id); if(i>=0){a[i]={...a[i],...p.data}; save(K.P,a);} return { success:true }; },
-        deletePayment: () => { save(K.P, load(K.P,[]).filter(x=>x.id!==p.id)); return { success:true }; },
-        addPackage:    () => { const a = load(K.K,[]); a.push(p.data); save(K.K,a); return { success:true }; },
-        updatePackage: () => { const a = load(K.K,[]); const i = a.findIndex(x=>x.id===p.id); if(i>=0){a[i]={...a[i],...p.data}; save(K.K,a);} return { success:true }; },
-        deletePackage: () => { save(K.K, load(K.K,[]).filter(x=>x.id!==p.id)); return { success:true }; },
-        updateSettings: () => { save(K.S, { ...load(K.S,{}), ...p.data }); return { success:true }; }
-      };
-      return delay(map[action] ? map[action]() : { success:false, error:'Unknown action' });
-    }
-  };
-})();
-
-/* ============================================================
- *  UTILS
- * ============================================================ */
-const U = {
-  fmtDate(s) {
-    if (!s) return '—';
-    const d = new Date(s);
-    if (isNaN(d)) return s;
-    return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
-  },
-  fmtMoney(n, currency = '₹') {
-    return currency + Number(n || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 });
-  },
-  today: () => new Date().toISOString().slice(0,10),
-  daysLeft(end) {
-    if (!end) return 0;
-    const t = new Date(); t.setHours(0,0,0,0);
-    const e = new Date(end); e.setHours(0,0,0,0);
-    return Math.ceil((e - t) / 864e5);
-  },
-  status(end, warn = 7) {
-    const d = U.daysLeft(end);
-    if (d < 0) return 'expired';
-    if (d <= warn) return 'expiring';
-    return 'active';
-  },
-  uid(prefix = 'id') {
-    return prefix + '_' + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
-  },
-  esc(s) {
-    return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  },
-  toast(msg, type = 'info') {
-    const root = document.getElementById('toasts');
-    const el = document.createElement('div');
-    el.className = 'toast ' + type;
-    el.textContent = msg;
-    root.appendChild(el);
-    setTimeout(() => {
-      el.style.transition = 'opacity .3s, transform .3s';
-      el.style.opacity = '0';
-      el.style.transform = 'translateX(110%)';
-      setTimeout(() => el.remove(), 320);
-    }, 3200);
-  },
-  loading(on) {
-    const root = document.getElementById('loadingRoot');
-    root.innerHTML = on ? '<div class="loading-overlay"><div class="spinner"></div></div>' : '';
-  },
-  confirm(msg) {
-    return new Promise(resolve => {
-      const root = document.getElementById('modalRoot');
-      const overlay = document.createElement('div');
-      overlay.className = 'modal-overlay';
-      overlay.innerHTML = `
-        <div class="modal" style="max-width:400px;">
-          <div class="modal-head"><div class="modal-title">Confirm</div></div>
-          <div class="modal-body"><p style="color:var(--text-dim)">${U.esc(msg)}</p></div>
-          <div class="modal-foot">
-            <button class="btn" data-act="no">Cancel</button>
-            <button class="btn btn-danger" data-act="yes">Confirm</button>
-          </div>
-        </div>`;
-      root.appendChild(overlay);
-      overlay.addEventListener('click', e => {
-        if (e.target === overlay) { overlay.remove(); resolve(false); }
-      });
-      overlay.querySelector('[data-act="no"]').onclick  = () => { overlay.remove(); resolve(false); };
-      overlay.querySelector('[data-act="yes"]').onclick = () => { overlay.remove(); resolve(true); };
-    });
-  },
-  whatsapp(phone, message) {
-    const clean = String(phone).replace(/\D/g, '');
-    window.open(`https://wa.me/${clean}?text=${encodeURIComponent(message)}`, '_blank');
-  }
-};
-
-/* ============================================================
- *  APP STATE
- * ============================================================ */
-const State = {
-  members: [],
-  attendance: [],
-  payments: [],
+   GLOBAL STATE / CACHE
+   ============================================================ */
+const state = {
+  user: null,
+  gym: null,
+  settings: null,
   packages: [],
-  settings: {},
-  page: 'dashboard',
-  filters: {},
-  async refresh() {
-    const r = await API.getAll();
-    if (r.success) {
-      State.members    = r.data.members    || [];
-      State.attendance = r.data.attendance || [];
-      State.payments   = r.data.payments   || [];
-      State.packages   = r.data.packages   || [];
-      State.settings   = r.data.settings   || {};
+  currentPage: 'dashboard',
+  membersCache: {},     // id -> member object
+  membersList: [],
+  pendingEditMember: null,
+};
+
+const CURRENCY = () => state.settings?.currency || '₹';
+const WARNING_DAYS = () => state.settings?.warning_days || 7;
+
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+function $(sel, root = document) { return root.querySelector(sel); }
+function $$(sel, root = document) { return [...root.querySelectorAll(sel)]; }
+
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str).replace(/[&<>"']/g, c => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[c]));
+}
+
+function formatDate(d) {
+  if (!d) return '—';
+  const dt = new Date(d + 'T00:00:00');
+  if (isNaN(dt)) return d;
+  return dt.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' });
+}
+
+function formatTime(t) {
+  if (!t) return '—';
+  const [h, m] = t.split(':');
+  const hr = parseInt(h);
+  const ampm = hr >= 12 ? 'PM' : 'AM';
+  const h12 = hr % 12 || 12;
+  return `${h12}:${m} ${ampm}`;
+}
+
+function todayISO() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function daysBetween(a, b) {
+  const d1 = new Date(a + 'T00:00:00');
+  const d2 = new Date(b + 'T00:00:00');
+  return Math.round((d2 - d1) / 86400000);
+}
+
+function money(n) {
+  const num = Number(n) || 0;
+  return CURRENCY() + num.toLocaleString('en-IN', { maximumFractionDigits: 2 });
+}
+
+/** Compute membership status for a member */
+function memberStatus(member) {
+  if (!member || !member.end_date) return 'no-membership';
+  const today = todayISO();
+  const remaining = daysBetween(today, member.end_date);
+  if (remaining < 0) return 'expired';
+  if (remaining <= WARNING_DAYS()) return 'expiring-soon';
+  return 'active';
+}
+
+function statusBadge(status) {
+  const map = {
+    'active': ['Active', 'badge-active'],
+    'expired': ['Expired', 'badge-expired'],
+    'expiring-soon': ['Expiring Soon', 'badge-soon'],
+    'no-membership': ['No Membership', 'badge-gray'],
+  };
+  const [label, cls] = map[status] || ['Unknown', 'badge-gray'];
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+function getPending(member) {
+  return (Number(member.amount) || 0) - (Number(member.paid) || 0);
+}
+
+/* ============================================================
+   TOASTS
+   ============================================================ */
+function toast(message, type = 'success') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.textContent = message;
+  $('#toastContainer').appendChild(el);
+  setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(100%)';
+    el.style.transition = 'all .3s';
+    setTimeout(() => el.remove(), 300);
+  }, 3200);
+}
+
+/* ============================================================
+   MODAL
+   ============================================================ */
+function openModal({ title, body, footer, wide = false }) {
+  $('#modalTitle').textContent = title;
+  $('#modalBody').innerHTML = body;
+  $('#modalFooter').innerHTML = footer || '';
+  $('#modalBox').classList.toggle('wide', wide);
+  $('#modalOverlay').classList.add('show');
+}
+function closeModal() {
+  $('#modalOverlay').classList.remove('show');
+  $('#modalBody').innerHTML = '';
+  $('#modalFooter').innerHTML = '';
+  state.pendingEditMember = null;
+}
+$('#modalClose').addEventListener('click', closeModal);
+$('#modalOverlay').addEventListener('click', e => {
+  if (e.target.id === 'modalOverlay') closeModal();
+});
+
+/* ============================================================
+   AUTH  (js/auth.js)
+   ============================================================ */
+async function checkAuth() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session?.user) {
+    state.user = session.user;
+    await bootApp();
+  } else {
+    showLogin();
+  }
+}
+
+function showLogin() {
+  $('#loginScreen').style.display = 'flex';
+  $('#app').style.display = 'none';
+}
+
+function showApp() {
+  $('#loginScreen').style.display = 'none';
+  $('#app').style.display = 'flex';
+  $('#userEmail').textContent = state.user?.email || '';
+}
+
+$('#loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = $('#loginBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Signing in...';
+  const email = $('#loginEmail').value.trim();
+  const password = $('#loginPassword').value;
+  try {
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    state.user = data.user;
+    toast('Welcome back!');
+    await bootApp();
+  } catch (err) {
+    console.error(err);
+    toast(friendlyError(err), 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Sign In';
+  }
+});
+
+$('#logoutBtn').addEventListener('click', async () => {
+  await sb.auth.signOut();
+  state.user = null;
+  state.gym = null;
+  state.settings = null;
+  state.packages = [];
+  state.membersCache = {};
+  showLogin();
+  toast('Signed out');
+});
+
+/* ============================================================
+   DATA ACCESS LAYER  (js/supabase.js continued)
+   ============================================================ */
+function friendlyError(err) {
+  const msg = (err?.message || '').toLowerCase();
+  if (msg.includes('invalid login')) return 'Invalid email or password';
+  if (msg.includes('email not confirmed')) return 'Please confirm your email first';
+  if (msg.includes('duplicate') && msg.includes('member_id')) return 'Member ID already exists';
+  if (msg.includes('duplicate') && msg.includes('attendance')) return 'Attendance already recorded today';
+  if (msg.includes('permission') || msg.includes('policy')) return 'You do not have permission for this action';
+  if (msg.includes('network') || msg.includes('fetch')) return 'Network error. Check your connection.';
+  return err?.message || 'Something went wrong';
+}
+
+const api = {
+  /* -------- GYM -------- */
+  async ensureGym() {
+    const { data: existing } = await sb.from('gyms').select('*').limit(1).maybeSingle();
+    if (existing) return existing;
+    const { data, error } = await sb.from('gyms')
+      .insert({ name: 'My Gym', owner_id: state.user.id })
+      .select().single();
+    if (error) throw error;
+    return data;
+  },
+
+  /* -------- SETTINGS -------- */
+  async getSettings(gymId) {
+    const { data } = await sb.from('gym_settings').select('*').eq('gym_id', gymId).maybeSingle();
+    if (data) return data;
+    const { data: created, error } = await sb.from('gym_settings')
+      .insert({ gym_id: gymId, gym_name: 'My Gym' })
+      .select().single();
+    if (error) throw error;
+    return created;
+  },
+  async updateSettings(id, patch) {
+    const { data, error } = await sb.from('gym_settings')
+      .update(patch).eq('id', id).select().single();
+    if (error) throw error;
+    return data;
+  },
+
+  /* -------- PACKAGES -------- */
+  async getPackages(gymId) {
+    const { data, error } = await sb.from('packages')
+      .select('id,name,duration_months,price,description,status')
+      .eq('gym_id', gymId).eq('status', 'active')
+      .order('duration_months');
+    if (error) throw error;
+    return data || [];
+  },
+  async createPackage(gymId, p) {
+    const { data, error } = await sb.from('packages')
+      .insert({ ...p, gym_id: gymId }).select().single();
+    if (error) throw error;
+    return data;
+  },
+  async updatePackage(id, patch) {
+    const { data, error } = await sb.from('packages')
+      .update(patch).eq('id', id).select().single();
+    if (error) throw error;
+    return data;
+  },
+  async deletePackage(id) {
+    const { error } = await sb.from('packages').update({ status: 'inactive' }).eq('id', id);
+    if (error) throw error;
+  },
+
+  /* -------- MEMBERS -------- */
+  async getMembers(gymId, { search = '', filter = 'all', limit = 500 } = {}) {
+    let q = sb.from('members')
+      .select('id,member_id,name,phone,email,gender,package_id,start_date,end_date,amount,paid,joining_date')
+      .eq('gym_id', gymId)
+      .order('created_at', { ascending: false })
+      .limit(limit);
+    if (search) {
+      q = q.or(`name.ilike.%${search}%,phone.ilike.%${search}%,member_id.ilike.%${search}%`);
     }
-  }
+    const { data, error } = await q;
+    if (error) throw error;
+    let list = data || [];
+    if (filter === 'active') list = list.filter(m => memberStatus(m) === 'active');
+    else if (filter === 'expired') list = list.filter(m => memberStatus(m) === 'expired');
+    else if (filter === 'expiring-soon') list = list.filter(m => memberStatus(m) === 'expiring-soon');
+    return list;
+  },
+  async getMember(id) {
+    const { data, error } = await sb.from('members').select('*').eq('id', id).single();
+    if (error) throw error;
+    return data;
+  },
+  async createMember(gymId, m) {
+    const { data, error } = await sb.from('members')
+      .insert({ ...m, gym_id: gymId }).select().single();
+    if (error) throw error;
+    return data;
+  },
+  async updateMember(id, patch) {
+    const { data, error } = await sb.from('members')
+      .update(patch).eq('id', id).select().single();
+    if (error) throw error;
+    return data;
+  },
+  async deleteMember(id) {
+    const { error } = await sb.from('members').delete().eq('id', id);
+    if (error) throw error;
+  },
+  async nextMemberId(gymId) {
+    const { data } = await sb.from('members')
+      .select('member_id').eq('gym_id', gymId)
+      .order('created_at', { ascending: false }).limit(1);
+    let next = 1;
+    if (data?.[0]?.member_id) {
+      const n = parseInt(data[0].member_id.replace(/\D/g, ''), 10);
+      if (!isNaN(n)) next = n + 1;
+    }
+    return 'M' + String(next).padStart(4, '0');
+  },
+
+  /* -------- ATTENDANCE -------- */
+  async getAttendance(gymId, { date = null, memberId = null, limit = 200 } = {}) {
+    let q = sb.from('attendance')
+      .select('id,member_id,date,check_in,check_out,members(name,member_id,phone)')
+      .eq('gym_id', gymId)
+      .order('date', { ascending: false })
+      .order('check_in', { ascending: false })
+      .limit(limit);
+    if (date) q = q.eq('date', date);
+    if (memberId) q = q.eq('member_id', memberId);
+    const { data, error } = await q;
+    if (error) throw error;
+    return data || [];
+  },
+  async getTodayAttendanceForMember(gymId, memberId) {
+    const { data } = await sb.from('attendance')
+      .select('*').eq('gym_id', gymId).eq('member_id', memberId)
+      .eq('date', todayISO()).maybeSingle();
+    return data;
+  },
+  async markAttendance(gymId, memberId) {
+    const now = new Date();
+    const time = now.toTimeString().split(' ')[0];
+    const { data, error } = await sb.from('attendance')
+      .insert({ gym_id: gymId, member_id: memberId, date: todayISO(), check_in: time })
+      .select().single();
+    if (error) {
+      if (error.code === '23505') throw new Error('Attendance already recorded today');
+      throw error;
+    }
+    return data;
+  },
+  async checkoutAttendance(id) {
+    const time = new Date().toTimeString().split(' ')[0];
+    const { data, error } = await sb.from('attendance')
+      .update({ check_out: time }).eq('id', id).select().single();
+    if (error) throw error;
+    return data;
+  },
+  async countTodayAttendance(gymId) {
+    const { count } = await sb.from('attendance')
+      .select('id', { count: 'exact', head: true })
+      .eq('gym_id', gymId).eq('date', todayISO());
+    return count || 0;
+  },
+
+  /* -------- PAYMENTS -------- */
+  async getPayments(gymId, { memberId = null, from = null, to = null, search = '', limit = 200 } = {}) {
+    let q = sb.from('payments')
+      .select('id,member_id,date,amount,method,package,transaction_id,notes,members(name,member_id,phone)')
+      .eq('gym_id', gymId)
+      .order('date', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(limit);
+    if (memberId) q = q.eq('member_id', memberId);
+    if (from) q = q.gte('date', from);
+    if (to) q = q.lte('date', to);
+    const { data, error } = await q;
+    if (error) throw error;
+    let list = data || [];
+    if (search) {
+      const s = search.toLowerCase();
+      list = list.filter(p =>
+        p.members?.name?.toLowerCase().includes(s) ||
+        p.members?.member_id?.toLowerCase().includes(s) ||
+        p.members?.phone?.includes(s) ||
+        p.transaction_id?.toLowerCase().includes(s)
+      );
+    }
+    return list;
+  },
+  async createPayment(gymId, p) {
+    const { data, error } = await sb.from('payments')
+      .insert({ ...p, gym_id: gymId }).select().single();
+    if (error) throw error;
+    // Update member paid amount
+    const member = await api.getMember(p.member_id);
+    const newPaid = (Number(member.paid) || 0) + Number(p.amount);
+    await api.updateMember(member.id, { paid: newPaid });
+    return data;
+  },
+  async updatePayment(id, patch) {
+    const before = (await sb.from('payments').select('*').eq('id', id).single()).data;
+    const { data, error } = await sb.from('payments')
+      .update(patch).eq('id', id).select().single();
+    if (error) throw error;
+    // Adjust member paid
+    if (before && patch.amount !== undefined && Number(patch.amount) !== Number(before.amount)) {
+      const diff = Number(patch.amount) - Number(before.amount);
+      const member = await api.getMember(before.member_id);
+      await api.updateMember(member.id, { paid: (Number(member.paid) || 0) + diff });
+    }
+    return data;
+  },
+  async deletePayment(id) {
+    const before = (await sb.from('payments').select('*').eq('id', id).single()).data;
+    const { error } = await sb.from('payments').delete().eq('id', id);
+    if (error) throw error;
+    if (before) {
+      const member = await api.getMember(before.member_id);
+      await api.updateMember(member.id, {
+        paid: Math.max(0, (Number(member.paid) || 0) - Number(before.amount))
+      });
+    }
+  },
+
+  /* -------- DASHBOARD -------- */
+  async getDashboardStats(gymId) {
+    const today = todayISO();
+    const now = new Date();
+    const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
+
+    // We need enough member data to compute status. Pull minimum columns.
+    const { data: members } = await sb.from('members')
+      .select('id,end_date,amount,paid').eq('gym_id', gymId).limit(5000);
+
+    const list = members || [];
+    let active = 0, expired = 0, expiring = 0, totalPending = 0;
+    for (const m of list) {
+      const s = memberStatus(m);
+      if (s === 'active') active++;
+      else if (s === 'expired') expired++;
+      else if (s === 'expiring-soon') expiring++;
+      totalPending += Math.max(0, getPending(m));
+    }
+
+    // Revenue (today & this month)
+    const { data: todayPays } = await sb.from('payments')
+      .select('amount').eq('gym_id', gymId).eq('date', today);
+    const todayRevenue = (todayPays || []).reduce((s, p) => s + Number(p.amount), 0);
+
+    const { data: monthPays } = await sb.from('payments')
+      .select('amount').eq('gym_id', gymId).gte('date', monthStart).lte('date', monthEnd);
+    const monthRevenue = (monthPays || []).reduce((s, p) => s + Number(p.amount), 0);
+
+    const todayAttendance = await api.countTodayAttendance(gymId);
+
+    return {
+      totalMembers: list.length,
+      active, expired, expiring,
+      todayAttendance,
+      todayRevenue,
+      monthRevenue,
+      pendingPayments: totalPending,
+    };
+  },
+
+  async getExpiryBuckets(gymId) {
+    const { data: members } = await sb.from('members')
+      .select('id,member_id,name,phone,end_date,amount,paid,packages(name)')
+      .eq('gym_id', gymId).limit(5000);
+    const today = todayISO();
+    const buckets = { expired: [], d7: [], d15: [], d30: [] };
+    for (const m of members || []) {
+      if (!m.end_date) continue;
+      const rem = daysBetween(today, m.end_date);
+      if (rem < 0) buckets.expired.push(m);
+      else if (rem <= 7) buckets.d7.push(m);
+      else if (rem <= 15) buckets.d15.push(m);
+      else if (rem <= 30) buckets.d30.push(m);
+    }
+    return buckets;
+  },
+
+  /* -------- REPORTS -------- */
+  async getReport(gymId, from, to) {
+    const { data: newMembers } = await sb.from('members')
+      .select('id,joining_date').eq('gym_id', gymId)
+      .gte('joining_date', from).lte('joining_date', to);
+
+    const { data: pays } = await sb.from('payments')
+      .select('amount,date,method').eq('gym_id', gymId)
+      .gte('date', from).lte('date', to);
+
+    const { count: attendance } = await sb.from('attendance')
+      .select('id', { count: 'exact', head: true })
+      .eq('gym_id', gymId).gte('date', from).lte('date', to);
+
+    const { data: allMembers } = await sb.from('members')
+      .select('id,end_date,amount,paid').eq('gym_id', gymId);
+
+    let active = 0, expired = 0, pending = 0;
+    (allMembers || []).forEach(m => {
+      const s = memberStatus(m);
+      if (s === 'active' || s === 'expiring-soon') active++;
+      else if (s === 'expired') expired++;
+      pending += Math.max(0, getPending(m));
+    });
+
+    const revenue = (pays || []).reduce((s, p) => s + Number(p.amount), 0);
+    const byMethod = {};
+    (pays || []).forEach(p => {
+      byMethod[p.method] = (byMethod[p.method] || 0) + Number(p.amount);
+    });
+
+    return {
+      newMembers: newMembers?.length || 0,
+      revenue,
+      byMethod,
+      attendance: attendance || 0,
+      totalMembers: allMembers?.length || 0,
+      activeMembers: active,
+      expiredMembers: expired,
+      pendingPayments: pending,
+    };
+  },
 };
 
 /* ============================================================
- *  ICONS
- * ============================================================ */
-const I = {
-  dashboard:  '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>',
-  members:    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
-  packages:   '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',
-  attendance: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
-  payments:   '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>',
-  expiry:     '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',
-  reports:    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
-  settings:   '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>',
-  plus:       '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
-  search:     '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',
-  check:      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>',
-  cash:       '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>',
-  edit:       '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>',
-  trash:      '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>',
-  eye:        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',
-  refresh:    '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>',
-  whatsapp:   '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413"/></svg>'
-};
-
-/* ============================================================
- *  NAV
- * ============================================================ */
-const NAV = [
-  { id:'dashboard',  label:'Dashboard',  icon:I.dashboard },
-  { id:'members',    label:'Members',    icon:I.members },
-  { id:'packages',   label:'Packages',   icon:I.packages },
-  { id:'attendance', label:'Attendance', icon:I.attendance },
-  { id:'payments',   label:'Payments',   icon:I.payments },
-  { id:'expiry',     label:'Expiry',     icon:I.expiry },
-  { id:'reports',    label:'Reports',    icon:I.reports },
-  { id:'settings',   label:'Settings',   icon:I.settings }
-];
-
-function renderNav() {
-  const root = document.getElementById('navRoot');
-  root.innerHTML = NAV.map(n => `
-    <button class="nav-item ${State.page === n.id ? 'active' : ''}" data-page="${n.id}">
-      ${n.icon}<span>${n.label}</span>
-    </button>
-  `).join('');
-  root.querySelectorAll('[data-page]').forEach(b => {
-    b.onclick = () => { State.page = b.dataset.page; closeSidebar(); render(); };
-  });
-}
-
-function closeSidebar() {
-  document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebarBackdrop').classList.remove('show');
-}
-
-async function render() {
-  renderNav();
-  document.getElementById('brandName').textContent = State.settings.gymName || 'Gym CRM';
-  const main = document.getElementById('mainRoot');
-  U.loading(true);
-  try { await State.refresh(); }
-  catch (e) { U.toast(e.message, 'error'); }
-  U.loading(false);
-
-  switch (State.page) {
-    case 'dashboard':  main.innerHTML = pageDashboard();  break;
-    case 'members':    main.innerHTML = pageMembers();    break;
-    case 'packages':   main.innerHTML = pagePackages();   break;
-    case 'attendance': main.innerHTML = pageAttendance(); break;
-    case 'payments':   main.innerHTML = pagePayments();   break;
-    case 'expiry':     main.innerHTML = pageExpiry();     break;
-    case 'reports':    main.innerHTML = pageReports();    break;
-    case 'settings':   main.innerHTML = pageSettings();   break;
+   BOOT / INITIAL LOAD
+   ============================================================ */
+async function bootApp() {
+  try {
+    showApp();
+    setPageTitle('Loading...');
+    state.gym = await api.ensureGym();
+    // Load settings + packages in parallel
+    const [settings, packages] = await Promise.all([
+      api.getSettings(state.gym.id),
+      api.getPackages(state.gym.id),
+    ]);
+    state.settings = settings;
+    state.packages = packages;
+    document.title = `${settings.gym_name} — VelvetNet CRM`;
+    navigate('dashboard');
+  } catch (err) {
+    console.error(err);
+    toast(friendlyError(err), 'error');
+    setPageTitle('Error');
   }
-  bindPageEvents();
 }
 
 /* ============================================================
- *  PAGE: DASHBOARD
- * ============================================================ */
-function pageDashboard() {
-  const { members, attendance, payments, settings } = State;
-  const today = U.today();
-  const warn = Number(settings.expiryWarningDays) || 7;
+   NAVIGATION
+   ============================================================ */
+function setPageTitle(t) { $('#pageTitle').textContent = t; }
 
-  const total     = members.length;
-  const active    = members.filter(m => U.status(m.endDate, warn) === 'active').length;
-  const expired   = members.filter(m => U.status(m.endDate, warn) === 'expired').length;
-  const expiring  = members.filter(m => U.status(m.endDate, warn) === 'expiring').length;
-  const todayAtt  = attendance.filter(a => a.date === today).length;
-  const todayRev  = payments.filter(p => p.date === today).reduce((s,p) => s + Number(p.amount||0), 0);
-  const pending   = members.reduce((s,m) => s + Number(m.pending||0), 0);
+function navigate(page) {
+  state.currentPage = page;
+  $$('#navMenu .nav-item').forEach(b =>
+    b.classList.toggle('active', b.dataset.page === page)
+  );
+  closeSidebarMobile();
+  $('#topbarActions').innerHTML = '';
+  const content = $('#pageContent');
+  content.innerHTML = '<div class="loading-overlay"><span class="spinner" style="border-color:var(--border);border-top-color:var(--accent)"></span> Loading...</div>';
 
-  const recentMembers = [...members]
-    .sort((a,b) => new Date(b.createdAt || b.joiningDate) - new Date(a.createdAt || a.joiningDate))
-    .slice(0, 5);
+  const titles = {
+    dashboard: 'Dashboard', members: 'Members', attendance: 'Attendance',
+    payments: 'Payments', memberships: 'Membership Packages', expiry: 'Expiry Management',
+    reports: 'Reports', settings: 'Settings',
+  };
+  setPageTitle(titles[page] || page);
 
-  const recentPayments = [...payments]
-    .sort((a,b) => new Date(b.createdAt || b.date) - new Date(a.createdAt || a.date))
-    .slice(0, 5);
+  const renderers = {
+    dashboard: renderDashboard,
+    members: renderMembers,
+    attendance: renderAttendance,
+    payments: renderPayments,
+    memberships: renderPackages,
+    expiry: renderExpiry,
+    reports: renderReports,
+    settings: renderSettings,
+  };
+  (renderers[page] || renderDashboard)();
+}
 
-  const expiringList = members
-    .filter(m => { const d = U.daysLeft(m.endDate); return d >= 0 && d <= warn; })
-    .sort((a,b) => U.daysLeft(a.endDate) - U.daysLeft(b.endDate))
-    .slice(0, 5);
+$$('#navMenu .nav-item').forEach(btn => {
+  btn.addEventListener('click', () => navigate(btn.dataset.page));
+});
 
-  const memberName = id => (members.find(m => m.id === id) || {}).name || '—';
+/* ============================================================
+   MOBILE SIDEBAR
+   ============================================================ */
+function openSidebarMobile() {
+  $('#sidebar').classList.add('open');
+  $('#sidebarBackdrop').classList.add('show');
+}
+function closeSidebarMobile() {
+  $('#sidebar').classList.remove('open');
+  $('#sidebarBackdrop').classList.remove('show');
+}
+$('#mobileMenuBtn').addEventListener('click', openSidebarMobile);
+$('#sidebarBackdrop').addEventListener('click', closeSidebarMobile);
 
-  return `
-    <div class="page-head">
-      <div>
-        <h1 class="page-title">Dashboard</h1>
-        <p class="page-sub">${U.esc(settings.gymName || 'Gym')} · ${U.fmtDate(today)}</p>
-      </div>
-      <div class="page-actions">
-        <button class="btn" data-act="refresh">${I.refresh} Refresh</button>
-      </div>
-    </div>
+/* ============================================================
+   PAGE: DASHBOARD
+   ============================================================ */
+async function renderDashboard() {
+  try {
+    const stats = await api.getDashboardStats(state.gym.id);
+    const buckets = await api.getExpiryBuckets(state.gym.id);
+    const upcoming = [...buckets.d7, ...buckets.d15]
+      .sort((a, b) => (a.end_date > b.end_date ? 1 : -1))
+      .slice(0, 6);
 
-    <div class="stats">
-      <div class="stat"><div class="stat-label">Total Members</div><div class="stat-value">${total}</div></div>
-      <div class="stat"><div class="stat-label">Active</div><div class="stat-value" style="color:#4ade80">${active}</div></div>
-      <div class="stat"><div class="stat-label">Expiring Soon</div><div class="stat-value" style="color:#fbbf24">${expiring}</div></div>
-      <div class="stat"><div class="stat-label">Expired</div><div class="stat-value" style="color:#f87171">${expired}</div></div>
-      <div class="stat"><div class="stat-label">Today's Attendance</div><div class="stat-value">${todayAtt}</div></div>
-      <div class="stat"><div class="stat-label">Today's Revenue</div><div class="stat-value">${U.fmtMoney(todayRev, settings.currency)}</div></div>
-      <div class="stat"><div class="stat-label">Pending Amount</div><div class="stat-value" style="color:#fbbf24">${U.fmtMoney(pending, settings.currency)}</div></div>
-    </div>
-
-    <div class="quick-actions">
-      <button class="qa-btn" data-act="add-member">
-        <div class="qa-icon">${I.plus}</div>
-        <div><div class="font-600">Add Member</div><div class="text-xs text-muted">Register a new member</div></div>
-      </button>
-      <button class="qa-btn" data-act="mark-attendance">
-        <div class="qa-icon">${I.check}</div>
-        <div><div class="font-600">Mark Attendance</div><div class="text-xs text-muted">Check in a member</div></div>
-      </button>
-      <button class="qa-btn" data-act="add-payment">
-        <div class="qa-icon">${I.cash}</div>
-        <div><div class="font-600">Record Payment</div><div class="text-xs text-muted">Log a transaction</div></div>
-      </button>
-      <button class="qa-btn" data-act="go-expiry">
-        <div class="qa-icon">${I.expiry}</div>
-        <div><div class="font-600">Renew Membership</div><div class="text-xs text-muted">${expiring} expiring soon</div></div>
-      </button>
-    </div>
-
-    <div class="grid-2">
-      <div class="table-wrap">
-        <div class="table-head"><div class="card-title">Recent Members</div></div>
-        ${recentMembers.length ? `
-          <table><thead><tr><th>Name</th><th>Package</th><th>Joined</th></tr></thead>
-          <tbody>${recentMembers.map(m => `
-            <tr><td>${U.esc(m.name)}</td><td>${U.esc(m.package||'—')}</td><td class="text-dim">${U.fmtDate(m.joiningDate)}</td></tr>
-          `).join('')}</tbody></table>
-        ` : `<div class="empty"><div class="empty-icon">👥</div><div class="empty-title">No members yet</div><div class="empty-sub">Add your first member to get started</div></div>`}
+    $('#pageContent').innerHTML = `
+      <div class="stats-grid">
+        <div class="stat-card"><div class="label">Total Members</div><div class="value">${stats.totalMembers}</div><div class="sub">All time</div></div>
+        <div class="stat-card"><div class="label">Active</div><div class="value green">${stats.active}</div><div class="sub">Currently active</div></div>
+        <div class="stat-card"><div class="label">Expired</div><div class="value red">${stats.expired}</div><div class="sub">Need renewal</div></div>
+        <div class="stat-card"><div class="label">Expiring Soon</div><div class="value orange">${stats.expiring}</div><div class="sub">Within ${WARNING_DAYS()} days</div></div>
+        <div class="stat-card"><div class="label">Today's Attendance</div><div class="value blue">${stats.todayAttendance}</div><div class="sub">Check-ins today</div></div>
+        <div class="stat-card"><div class="label">Today's Revenue</div><div class="value green">${money(stats.todayRevenue)}</div><div class="sub">This month: ${money(stats.monthRevenue)}</div></div>
+        <div class="stat-card"><div class="label">Pending Payments</div><div class="value red">${money(stats.pendingPayments)}</div><div class="sub">Outstanding</div></div>
       </div>
 
-      <div class="table-wrap">
-        <div class="table-head"><div class="card-title">Recent Payments</div></div>
-        ${recentPayments.length ? `
-          <table><thead><tr><th>Member</th><th>Amount</th><th>Date</th></tr></thead>
-          <tbody>${recentPayments.map(p => `
-            <tr><td>${U.esc(memberName(p.memberId))}</td><td class="font-600">${U.fmtMoney(p.amount, settings.currency)}</td><td class="text-dim">${U.fmtDate(p.date)}</td></tr>
-          `).join('')}</tbody></table>
-        ` : `<div class="empty"><div class="empty-icon">💳</div><div class="empty-title">No payments yet</div><div class="empty-sub">Record payments to track revenue</div></div>`}
-      </div>
-    </div>
-
-    <div class="table-wrap">
-      <div class="table-head">
-        <div>
-          <div class="card-title">Expiring Memberships</div>
-          <div class="card-sub">Within ${warn} days</div>
+      <div class="card">
+        <div class="card-header"><h3>Upcoming Expiries (next 15 days)</h3></div>
+        <div class="card-body" style="padding:0">
+          ${upcoming.length === 0
+            ? `<div class="empty-state">No memberships expiring in the next 15 days 🎉</div>`
+            : `<div class="table-wrap"><table>
+                <thead><tr><th>Member</th><th>Phone</th><th>Expiry</th><th>Days Left</th><th>Pending</th><th></th></tr></thead>
+                <tbody>
+                  ${upcoming.map(m => {
+                    const rem = daysBetween(todayISO(), m.end_date);
+                    return `<tr>
+                      <td><strong>${escapeHtml(m.name)}</strong><br><span style="color:var(--text-muted);font-size:12px">${escapeHtml(m.member_id || '')}</span></td>
+                      <td>${escapeHtml(m.phone || '—')}</td>
+                      <td>${formatDate(m.end_date)}</td>
+                      <td><span class="badge ${rem <= 7 ? 'badge-soon' : 'badge-info'}">${rem} day${rem === 1 ? '' : 's'}</span></td>
+                      <td>${money(Math.max(0, getPending(m)))}</td>
+                      <td><button class="btn btn-secondary btn-sm" onclick="openRenewModal('${m.id}')">Renew</button></td>
+                    </tr>`;
+                  }).join('')}
+                </tbody></table></div>`}
         </div>
-        <button class="btn btn-sm" data-act="go-expiry">View all</button>
       </div>
-      ${expiringList.length ? `
-        <div class="table-scroll"><table>
-          <thead><tr><th>Name</th><th>Mobile</th><th>Package</th><th>Expiry</th><th>Days Left</th><th></th></tr></thead>
-          <tbody>${expiringList.map(m => {
-            const d = U.daysLeft(m.endDate);
-            const badge = d === 0 ? 'badge-danger' : 'badge-warning';
-            return `<tr>
-              <td class="font-600">${U.esc(m.name)}</td>
-              <td class="text-dim">${U.esc(m.phone)}</td>
-              <td>${U.esc(m.package||'—')}</td>
-              <td>${U.fmtDate(m.endDate)}</td>
-              <td><span class="badge ${badge}">${d === 0 ? 'Today' : d + ' days'}</span></td>
-              <td><button class="btn btn-sm" data-act="renew" data-id="${m.id}">Renew</button></td>
-            </tr>`;
-          }).join('')}</tbody>
-        </table></div>
-      ` : `<div class="empty"><div class="empty-icon">✓</div><div class="empty-title">All clear</div><div class="empty-sub">No memberships expiring soon</div></div>`}
-    </div>
-  `;
+    `;
+  } catch (err) {
+    console.error(err);
+    toast(friendlyError(err), 'error');
+    $('#pageContent').innerHTML = `<div class="empty-state">Failed to load dashboard</div>`;
+  }
 }
 
 /* ============================================================
- *  PAGE: MEMBERS
- * ============================================================ */
-function pageMembers() {
-  const { members, settings } = State;
-  const warn = Number(settings.expiryWarningDays) || 7;
-  const f = State.filters.members || {};
-  const search = (f.search || '').toLowerCase();
-  const statusFilter = f.status || 'all';
+   PAGE: MEMBERS
+   ============================================================ */
+let membersUI = { search: '', filter: 'all' };
 
-  const list = members.filter(m => {
-    if (search && !(m.name||'').toLowerCase().includes(search) &&
-        !(m.phone||'').includes(search) &&
-        !(m.email||'').toLowerCase().includes(search)) return false;
-    if (statusFilter !== 'all' && U.status(m.endDate, warn) !== statusFilter) return false;
-    return true;
+async function renderMembers() {
+  $('#topbarActions').innerHTML = `
+    <button class="btn btn-primary" id="addMemberBtn">+ Add Member</button>
+  `;
+  $('#addMemberBtn').addEventListener('click', openAddMemberModal);
+
+  $('#pageContent').innerHTML = `
+    <div class="toolbar">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="memberSearch" placeholder="Search by name, phone, or member ID..." value="${escapeHtml(membersUI.search)}">
+      </div>
+      <div class="filter-tabs" id="memberFilters">
+        <button data-f="all" class="${membersUI.filter==='all'?'active':''}">All</button>
+        <button data-f="active" class="${membersUI.filter==='active'?'active':''}">Active</button>
+        <button data-f="expiring-soon" class="${membersUI.filter==='expiring-soon'?'active':''}">Expiring Soon</button>
+        <button data-f="expired" class="${membersUI.filter==='expired'?'active':''}">Expired</button>
+      </div>
+    </div>
+    <div class="card"><div id="membersTable"><div class="loading-overlay"><span class="spinner" style="border-color:var(--border);border-top-color:var(--accent)"></span> Loading members...</div></div></div>
+  `;
+
+  let debounce;
+  $('#memberSearch').addEventListener('input', e => {
+    membersUI.search = e.target.value;
+    clearTimeout(debounce);
+    debounce = setTimeout(() => loadMembersTable(), 300);
+  });
+  $$('#memberFilters button').forEach(b => b.addEventListener('click', () => {
+    membersUI.filter = b.dataset.f;
+    $$('#memberFilters button').forEach(x => x.classList.toggle('active', x === b));
+    loadMembersTable();
+  }));
+
+  loadMembersTable();
+}
+
+async function loadMembersTable() {
+  const wrap = $('#membersTable');
+  if (!wrap) return;
+  wrap.innerHTML = '<div class="loading-overlay"><span class="spinner" style="border-color:var(--border);border-top-color:var(--accent)"></span> Loading...</div>';
+  try {
+    const members = await api.getMembers(state.gym.id, {
+      search: membersUI.search,
+      filter: membersUI.filter,
+    });
+    state.membersList = members;
+    state.membersCache = {};
+    members.forEach(m => state.membersCache[m.id] = m);
+
+    if (members.length === 0) {
+      wrap.innerHTML = '<div class="empty-state">No members found</div>';
+      return;
+    }
+
+    const pkgMap = {};
+    state.packages.forEach(p => pkgMap[p.id] = p.name);
+
+    wrap.innerHTML = `
+      <div class="table-wrap"><table>
+        <thead><tr>
+          <th>ID</th><th>Name</th><th>Phone</th><th>Package</th>
+          <th>Start</th><th>End</th><th>Amount</th><th>Paid</th><th>Pending</th>
+          <th>Status</th><th>Actions</th>
+        </tr></thead>
+        <tbody>
+          ${members.map(m => {
+            const status = memberStatus(m);
+            const pending = Math.max(0, getPending(m));
+            return `<tr>
+              <td>${escapeHtml(m.member_id || '—')}</td>
+              <td><strong>${escapeHtml(m.name)}</strong></td>
+              <td>${escapeHtml(m.phone || '—')}</td>
+              <td>${escapeHtml(pkgMap[m.package_id] || '—')}</td>
+              <td>${formatDate(m.start_date)}</td>
+              <td>${formatDate(m.end_date)}</td>
+              <td>${money(m.amount)}</td>
+              <td>${money(m.paid)}</td>
+              <td style="color:${pending>0?'var(--danger)':'inherit'};font-weight:${pending>0?'600':'400'}">${money(pending)}</td>
+              <td>${statusBadge(status)}</td>
+              <td class="actions-cell">
+                <button class="btn btn-secondary btn-sm" onclick="openMemberProfile('${m.id}')">View</button>
+                <button class="btn btn-secondary btn-sm" onclick="openRenewModal('${m.id}')">Renew</button>
+              </td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table></div>
+    `;
+  } catch (err) {
+    console.error(err);
+    wrap.innerHTML = `<div class="empty-state">Failed to load members</div>`;
+    toast(friendlyError(err), 'error');
+  }
+}
+
+/* -------- ADD/EDIT MEMBER MODAL -------- */
+async function openAddMemberModal() {
+  const nextId = await api.nextMemberId(state.gym.id);
+  openMemberForm(null, nextId);
+}
+
+function openMemberForm(member, presetMemberId) {
+  const isEdit = !!member;
+  const m = member || {
+    member_id: presetMemberId, name: '', phone: '', email: '', gender: '',
+    dob: '', address: '', joining_date: todayISO(),
+    package_id: '', start_date: todayISO(), end_date: '',
+    amount: 0, paid: 0, emergency_contact: '', notes: '',
+  };
+  const pkgOptions = state.packages.map(p =>
+    `<option value="${p.id}" data-dur="${p.duration_months}" data-price="${p.price}"
+      ${m.package_id === p.id ? 'selected' : ''}>${escapeHtml(p.name)} — ${money(p.price)} / ${p.duration_months} mo</option>`
+  ).join('');
+
+  openModal({
+    title: isEdit ? 'Edit Member' : 'Add Member',
+    wide: true,
+    body: `
+      <form id="memberForm" class="form-grid">
+        <div class="form-group"><label>Member ID</label>
+          <input name="member_id" value="${escapeHtml(m.member_id || '')}" readonly style="background:#f9fafb"></div>
+        <div class="form-group"><label>Name *</label>
+          <input name="name" required value="${escapeHtml(m.name || '')}"></div>
+        <div class="form-group"><label>Phone</label>
+          <input name="phone" value="${escapeHtml(m.phone || '')}"></div>
+        <div class="form-group"><label>Email</label>
+          <input name="email" type="email" value="${escapeHtml(m.email || '')}"></div>
+        <div class="form-group"><label>Gender</label>
+          <select name="gender">
+            <option value="">—</option>
+            <option value="Male" ${m.gender==='Male'?'selected':''}>Male</option>
+            <option value="Female" ${m.gender==='Female'?'selected':''}>Female</option>
+            <option value="Other" ${m.gender==='Other'?'selected':''}>Other</option>
+          </select></div>
+        <div class="form-group"><label>Date of Birth</label>
+          <input name="dob" type="date" value="${m.dob || ''}"></div>
+        <div class="form-group full"><label>Address</label>
+          <textarea name="address">${escapeHtml(m.address || '')}</textarea></div>
+        <div class="form-group"><label>Emergency Contact</label>
+          <input name="emergency_contact" value="${escapeHtml(m.emergency_contact || '')}"></div>
+        <div class="form-group"><label>Joining Date</label>
+          <input name="joining_date" type="date" value="${m.joining_date || todayISO()}"></div>
+
+        <div class="form-group full" style="margin-top:6px"><label style="font-size:14px;color:var(--accent)">Membership</label></div>
+        <div class="form-group"><label>Package</label>
+          <select name="package_id" id="pkgSelect">
+            <option value="">— No package —</option>
+            ${pkgOptions}
+          </select></div>
+        <div class="form-group"><label>Start Date</label>
+          <input name="start_date" id="startDate" type="date" value="${m.start_date || todayISO()}"></div>
+        <div class="form-group"><label>End Date</label>
+          <input name="end_date" id="endDate" type="date" value="${m.end_date || ''}"></div>
+        <div class="form-group"><label>Amount</label>
+          <input name="amount" id="amountInput" type="number" step="0.01" value="${m.amount || 0}"></div>
+        <div class="form-group"><label>Paid</label>
+          <input name="paid" type="number" step="0.01" value="${m.paid || 0}"></div>
+        <div class="form-group full"><label>Notes</label>
+          <textarea name="notes">${escapeHtml(m.notes || '')}</textarea></div>
+      </form>
+    `,
+    footer: `
+      ${isEdit ? `<button class="btn btn-danger" id="deleteMemberBtn">Delete</button>` : ''}
+      <button class="btn btn-secondary" id="cancelMemberBtn">Cancel</button>
+      <button class="btn btn-primary" id="saveMemberBtn">${isEdit ? 'Save Changes' : 'Add Member'}</button>
+    `
   });
 
-  return `
-    <div class="page-head">
-      <div><h1 class="page-title">Members</h1><p class="page-sub">${members.length} total · ${list.length} shown</p></div>
-      <div class="page-actions">
-        <button class="btn btn-primary" data-act="add-member">${I.plus} Add Member</button>
-      </div>
-    </div>
+  // Auto-calc end date & amount
+  const pkgSelect = $('#pkgSelect');
+  const startDate = $('#startDate');
+  const endDate = $('#endDate');
+  const amountInput = $('#amountInput');
 
-    <div class="toolbar">
-      <input class="input" id="memberSearch" placeholder="Search by name, phone, email…" value="${U.esc(f.search||'')}" style="flex:1;">
-      <select id="memberStatus">
-        <option value="all" ${statusFilter==='all'?'selected':''}>All status</option>
-        <option value="active" ${statusFilter==='active'?'selected':''}>Active</option>
-        <option value="expiring" ${statusFilter==='expiring'?'selected':''}>Expiring soon</option>
-        <option value="expired" ${statusFilter==='expired'?'selected':''}>Expired</option>
-      </select>
-    </div>
+  function recalc() {
+    const opt = pkgSelect.selectedOptions[0];
+    if (!opt || !opt.value) return;
+    const dur = parseInt(opt.dataset.dur, 10);
+    const price = parseFloat(opt.dataset.price);
+    if (!startDate.value) startDate.value = todayISO();
+    if (!endDate.value || !isEdit) {
+      const end = new Date(startDate.value + 'T00:00:00');
+      end.setMonth(end.getMonth() + dur);
+      endDate.value = end.toISOString().split('T')[0];
+    }
+    if (!amountInput.value || parseFloat(amountInput.value) === 0) amountInput.value = price;
+  }
+  pkgSelect.addEventListener('change', () => { endDate.value = ''; recalc(); });
+  startDate.addEventListener('change', () => { endDate.value = ''; recalc(); });
 
-    <div class="table-wrap">
-      ${list.length ? `
-        <div class="table-scroll"><table>
-          <thead><tr><th>Name</th><th>Mobile</th><th>Package</th><th>End Date</th><th>Status</th><th>Pending</th><th style="width:110px"></th></tr></thead>
-          <tbody>${list.map(m => {
-            const s = U.status(m.endDate, warn);
-            const badge = s === 'active' ? 'badge-success' : s === 'expiring' ? 'badge-warning' : 'badge-danger';
-            return `<tr>
-              <td>
-                <div class="font-600">${U.esc(m.name)}</div>
-                <div class="text-xs text-muted">${U.esc(m.email||'')}</div>
-              </td>
-              <td class="text-dim">${U.esc(m.phone)}</td>
-              <td>${U.esc(m.package||'—')}</td>
-              <td>${U.fmtDate(m.endDate)}</td>
-              <td><span class="badge ${badge}">${s}</span></td>
-              <td>${Number(m.pending||0) > 0 ? `<span style="color:#fbbf24">${U.fmtMoney(m.pending, settings.currency)}</span>` : '—'}</td>
-              <td>
-                <div class="flex gap-1">
-                  <button class="btn btn-icon btn-ghost" data-act="view-member" data-id="${m.id}" title="View">${I.eye}</button>
-                  <button class="btn btn-icon btn-ghost" data-act="edit-member" data-id="${m.id}" title="Edit">${I.edit}</button>
-                  <button class="btn btn-icon btn-ghost" data-act="delete-member" data-id="${m.id}" title="Delete">${I.trash}</button>
-                </div>
-              </td>
-            </tr>`;
-          }).join('')}</tbody>
-        </table></div>
-      ` : `<div class="empty"><div class="empty-icon">👥</div><div class="empty-title">No members found</div><div class="empty-sub">Try a different search or add a new member</div></div>`}
-    </div>
-  `;
+  $('#cancelMemberBtn').addEventListener('click', closeModal);
+
+  if (isEdit) {
+    $('#deleteMemberBtn').addEventListener('click', async () => {
+      if (!confirm('Delete this member? This will also delete their payments and attendance.')) return;
+      try {
+        await api.deleteMember(member.id);
+        toast('Member deleted');
+        closeModal();
+        loadMembersTable();
+      } catch (err) { toast(friendlyError(err), 'error'); }
+    });
+  }
+
+  $('#saveMemberBtn').addEventListener('click', async () => {
+    const btn = $('#saveMemberBtn');
+    const data = {};
+    new FormData($('#memberForm')).forEach((v, k) => {
+      data[k] = v === '' ? null : v;
+    });
+    if (!data.name) return toast('Name is required', 'error');
+    ['amount','paid'].forEach(k => data[k] = parseFloat(data[k]) || 0);
+    ['dob','joining_date','start_date','end_date'].forEach(k => {
+      if (!data[k]) delete data[k];
+    });
+    if (!data.package_id) data.package_id = null;
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Saving...';
+    try {
+      if (isEdit) {
+        await api.updateMember(member.id, data);
+        toast('Member updated');
+      } else {
+        await api.createMember(state.gym.id, data);
+        toast('Member added');
+      }
+      closeModal();
+      loadMembersTable();
+    } catch (err) {
+      console.error(err);
+      toast(friendlyError(err), 'error');
+      btn.disabled = false;
+      btn.textContent = isEdit ? 'Save Changes' : 'Add Member';
+    }
+  });
+}
+
+/* -------- MEMBER PROFILE -------- */
+async function openMemberProfile(id) {
+  openModal({ title: 'Loading...', body: '<div class="loading-overlay"><span class="spinner" style="border-color:var(--border);border-top-color:var(--accent)"></span> Loading profile...</div>', wide: true, footer: '' });
+  try {
+    const member = await api.getMember(id);
+    const [payments, attendance] = await Promise.all([
+      api.getPayments(state.gym.id, { memberId: id, limit: 100 }),
+      api.getAttendance(state.gym.id, { memberId: id, limit: 60 }),
+    ]);
+    state.pendingEditMember = member;
+    const pkg = state.packages.find(p => p.id === member.package_id);
+    const status = memberStatus(member);
+    const remaining = member.end_date ? daysBetween(todayISO(), member.end_date) : 0;
+
+    const wastText = encodeURIComponent(
+      `Hello ${member.name}, your ${state.settings.gym_name} membership is expiring on ${formatDate(member.end_date)}. Please contact us for renewal. Thank you.`
+    );
+    const waPhone = (member.phone || '').replace(/\D/g, '');
+
+    openModal({
+      title: escapeHtml(member.name),
+      wide: true,
+      body: `
+        <div class="section-title">Personal Information</div>
+        <div class="info-grid">
+          <div class="info-item"><div class="lbl">Member ID</div><div class="val">${escapeHtml(member.member_id||'—')}</div></div>
+          <div class="info-item"><div class="lbl">Name</div><div class="val">${escapeHtml(member.name)}</div></div>
+          <div class="info-item"><div class="lbl">Phone</div><div class="val">${escapeHtml(member.phone||'—')}</div></div>
+          <div class="info-item"><div class="lbl">Email</div><div class="val">${escapeHtml(member.email||'—')}</div></div>
+          <div class="info-item"><div class="lbl">Gender</div><div class="val">${escapeHtml(member.gender||'—')}</div></div>
+          <div class="info-item"><div class="lbl">Date of Birth</div><div class="val">${formatDate(member.dob)}</div></div>
+          <div class="info-item" style="grid-column:1/-1"><div class="lbl">Address</div><div class="val">${escapeHtml(member.address||'—')}</div></div>
+          <div class="info-item"><div class="lbl">Emergency Contact</div><div class="val">${escapeHtml(member.emergency_contact||'—')}</div></div>
+          <div class="info-item"><div class="lbl">Joining Date</div><div class="val">${formatDate(member.joining_date)}</div></div>
+        </div>
+
+        <div class="section-title">Membership</div>
+        <div class="info-grid">
+          <div class="info-item"><div class="lbl">Package</div><div class="val">${escapeHtml(pkg?.name||'—')}</div></div>
+          <div class="info-item"><div class="lbl">Status</div><div class="val">${statusBadge(status)}</div></div>
+          <div class="info-item"><div class="lbl">Start Date</div><div class="val">${formatDate(member.start_date)}</div></div>
+          <div class="info-item"><div class="lbl">End Date</div><div class="val">${formatDate(member.end_date)}</div></div>
+          <div class="info-item"><div class="lbl">Remaining Days</div><div class="val">${member.end_date ? (remaining < 0 ? `${Math.abs(remaining)} days ago` : `${remaining} days`) : '—'}</div></div>
+          <div class="info-item"><div class="lbl">Amount</div><div class="val">${money(member.amount)}</div></div>
+          <div class="info-item"><div class="lbl">Paid</div><div class="val">${money(member.paid)}</div></div>
+          <div class="info-item"><div class="lbl">Pending</div><div class="val" style="color:${getPending(member)>0?'var(--danger)':'var(--accent)'}">${money(Math.max(0, getPending(member)))}</div></div>
+        </div>
+
+        <div class="section-title">Payment History (${payments.length})</div>
+        ${payments.length === 0 ? '<div style="color:var(--text-muted);padding:12px 0">No payments yet.</div>' :
+          `<div class="table-wrap"><table>
+            <thead><tr><th>Date</th><th>Amount</th><th>Method</th><th>Package</th><th>Receipt</th></tr></thead>
+            <tbody>${payments.map(p => `<tr>
+              <td>${formatDate(p.date)}</td>
+              <td><strong>${money(p.amount)}</strong></td>
+              <td>${escapeHtml(p.method||'—')}</td>
+              <td>${escapeHtml(p.package||'—')}</td>
+              <td><button class="btn btn-secondary btn-sm" onclick="openReceipt('${p.id}')">View</button></td>
+            </tr>`).join('')}</tbody></table></div>`}
+
+        <div class="section-title">Attendance History (last ${attendance.length})</div>
+        ${attendance.length === 0 ? '<div style="color:var(--text-muted);padding:12px 0">No attendance records yet.</div>' :
+          `<div class="table-wrap"><table>
+            <thead><tr><th>Date</th><th>Check In</th><th>Check Out</th></tr></thead>
+            <tbody>${attendance.slice(0, 20).map(a => `<tr>
+              <td>${formatDate(a.date)}</td>
+              <td>${formatTime(a.check_in)}</td>
+              <td>${formatTime(a.check_out)}</td>
+            </tr>`).join('')}</tbody></table></div>`}
+      `,
+      footer: `
+        <button class="btn btn-secondary" onclick="openEditMemberFromProfile('${member.id}')">Edit</button>
+        <button class="btn btn-secondary" onclick="openRenewModal('${member.id}')">Renew</button>
+        <button class="btn btn-primary" onclick="openAddPaymentModal('${member.id}')">+ Add Payment</button>
+        ${waPhone ? `<a class="btn btn-secondary" style="background:#25D366;color:#fff;border:none" href="https://wa.me/${waPhone}?text=${wastText}" target="_blank">WhatsApp</a>` : ''}
+      `,
+    });
+  } catch (err) {
+    console.error(err);
+    closeModal();
+    toast(friendlyError(err), 'error');
+  }
+}
+
+async function openEditMemberFromProfile(id) {
+  const member = await api.getMember(id);
+  openMemberForm(member);
 }
 
 /* ============================================================
- *  PAGE: PACKAGES
- * ============================================================ */
-function pagePackages() {
-  const { packages, settings } = State;
-  return `
-    <div class="page-head">
-      <div><h1 class="page-title">Packages</h1><p class="page-sub">${packages.length} membership plans</p></div>
-      <div class="page-actions">
-        <button class="btn btn-primary" data-act="add-package">${I.plus} Add Package</button>
+   PAGE: ATTENDANCE
+   ============================================================ */
+async function renderAttendance() {
+  $('#pageContent').innerHTML = `
+    <div class="toolbar">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="attSearch" placeholder="Search member to check in...">
+      </div>
+      <input type="date" id="attDate" value="${todayISO()}" style="padding:10px 12px;border:1px solid var(--border);border-radius:8px;background:var(--white)">
+      <button class="btn btn-primary" id="markAttBtn">Mark Attendance</button>
+    </div>
+    <div class="card">
+      <div class="card-header"><h3 id="attListTitle">Today's Attendance</h3></div>
+      <div class="card-body" style="padding:0" id="attList">
+        <div class="loading-overlay"><span class="spinner" style="border-color:var(--border);border-top-color:var(--accent)"></span> Loading...</div>
       </div>
     </div>
-    <div class="table-wrap">
-      ${packages.length ? `
-        <div class="table-scroll"><table>
-          <thead><tr><th>Name</th><th>Duration</th><th>Price</th><th>Description</th><th>Status</th><th style="width:100px"></th></tr></thead>
-          <tbody>${packages.map(p => `<tr>
-            <td class="font-600">${U.esc(p.name)}</td>
-            <td class="text-dim">${p.duration} days</td>
-            <td class="font-600">${U.fmtMoney(p.price, settings.currency)}</td>
-            <td class="text-dim">${U.esc(p.description||'—')}</td>
-            <td><span class="badge ${p.status==='active'?'badge-success':'badge-danger'}">${U.esc(p.status||'active')}</span></td>
-            <td>
-              <div class="flex gap-1">
-                <button class="btn btn-icon btn-ghost" data-act="edit-package" data-id="${p.id}">${I.edit}</button>
-                <button class="btn btn-icon btn-ghost" data-act="delete-package" data-id="${p.id}">${I.trash}</button>
-              </div>
+  `;
+
+  $('#attDate').addEventListener('change', loadAttendanceTable);
+  $('#markAttBtn').addEventListener('click', () => openMarkAttendanceModal());
+  loadAttendanceTable();
+}
+
+async function loadAttendanceTable() {
+  const date = $('#attDate').value || todayISO();
+  const wrap = $('#attList');
+  if (!wrap) return;
+  wrap.innerHTML = '<div class="loading-overlay"><span class="spinner" style="border-color:var(--border);border-top-color:var(--accent)"></span> Loading...</div>';
+  try {
+    const list = await api.getAttendance(state.gym.id, { date, limit: 500 });
+    $('#attListTitle').textContent = `${formatDate(date)} — ${list.length} check-in${list.length===1?'':'s'}`;
+    if (list.length === 0) {
+      wrap.innerHTML = '<div class="empty-state">No attendance records for this date</div>';
+      return;
+    }
+    wrap.innerHTML = `
+      <div class="table-wrap"><table>
+        <thead><tr><th>Member</th><th>Member ID</th><th>Phone</th><th>Check In</th><th>Check Out</th><th></th></tr></thead>
+        <tbody>
+          ${list.map(a => `<tr>
+            <td><strong>${escapeHtml(a.members?.name || 'Unknown')}</strong></td>
+            <td>${escapeHtml(a.members?.member_id || '—')}</td>
+            <td>${escapeHtml(a.members?.phone || '—')}</td>
+            <td>${formatTime(a.check_in)}</td>
+            <td>${a.check_out ? formatTime(a.check_out) : '<span class="badge badge-info">In gym</span>'}</td>
+            <td>${!a.check_out ? `<button class="btn btn-secondary btn-sm" onclick="doCheckout('${a.id}')">Check Out</button>` : ''}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table></div>
+    `;
+  } catch (err) {
+    console.error(err);
+    wrap.innerHTML = '<div class="empty-state">Failed to load attendance</div>';
+  }
+}
+
+async function doCheckout(attendanceId) {
+  try {
+    await api.checkoutAttendance(attendanceId);
+    toast('Checked out');
+    loadAttendanceTable();
+  } catch (err) { toast(friendlyError(err), 'error'); }
+}
+
+async function openMarkAttendanceModal() {
+  // Load members for select
+  let members = state.membersList;
+  if (!members.length) {
+    members = await api.getMembers(state.gym.id, { limit: 1000 });
+  }
+  const activeMembers = members.filter(m => {
+    const s = memberStatus(m);
+    return s === 'active' || s === 'expiring-soon';
+  });
+
+  openModal({
+    title: 'Mark Attendance',
+    body: `
+      <div class="form-group">
+        <label>Search Member</label>
+        <input type="text" id="attModalSearch" placeholder="Type name or phone...">
+      </div>
+      <div id="attModalList" style="max-height:340px;overflow-y:auto;margin-top:14px;border:1px solid var(--border);border-radius:8px">
+        ${activeMembers.map(m => `
+          <div class="att-pick" data-id="${m.id}" style="padding:11px 14px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+            <div><strong>${escapeHtml(m.name)}</strong><br><span style="font-size:12px;color:var(--text-muted)">${escapeHtml(m.member_id||'')} · ${escapeHtml(m.phone||'')}</span></div>
+            <button class="btn btn-primary btn-sm">Check In</button>
+          </div>
+        `).join('')}
+      </div>
+    `,
+    footer: `<button class="btn btn-secondary" onclick="closeModal()">Close</button>`
+  });
+
+  const list = $('#attModalList');
+  const search = $('#attModalSearch');
+  function renderList(filter = '') {
+    const f = filter.toLowerCase();
+    const filtered = activeMembers.filter(m =>
+      !f || m.name.toLowerCase().includes(f) || (m.phone||'').includes(f) || (m.member_id||'').toLowerCase().includes(f)
+    );
+    if (filtered.length === 0) {
+      list.innerHTML = '<div class="empty-state" style="padding:20px">No matching active members</div>';
+      return;
+    }
+    list.innerHTML = filtered.map(m => `
+      <div class="att-pick" data-id="${m.id}" style="padding:11px 14px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+        <div><strong>${escapeHtml(m.name)}</strong><br><span style="font-size:12px;color:var(--text-muted)">${escapeHtml(m.member_id||'')} · ${escapeHtml(m.phone||'')}</span></div>
+        <button class="btn btn-primary btn-sm">Check In</button>
+      </div>
+    `).join('');
+    bindPick();
+  }
+  function bindPick() {
+    $$('.att-pick').forEach(el => {
+      el.addEventListener('click', async () => {
+        const id = el.dataset.id;
+        try {
+          const existing = await api.getTodayAttendanceForMember(state.gym.id, id);
+          if (existing) {
+            if (!existing.check_out) {
+              if (confirm('Already checked in. Check out now?')) {
+                await api.checkoutAttendance(existing.id);
+                toast('Checked out');
+                closeModal();
+                if (state.currentPage === 'attendance') loadAttendanceTable();
+              }
+            } else {
+              toast('Attendance already completed today', 'info');
+            }
+            return;
+          }
+          await api.markAttendance(state.gym.id, id);
+          toast('Attendance marked');
+          closeModal();
+          if (state.currentPage === 'attendance') loadAttendanceTable();
+        } catch (err) {
+          toast(friendlyError(err), 'error');
+        }
+      });
+    });
+  }
+  search.addEventListener('input', () => renderList(search.value));
+  bindPick();
+}
+
+/* ============================================================
+   PAGE: PAYMENTS
+   ============================================================ */
+let paymentsUI = { search: '', from: '', to: '' };
+
+async function renderPayments() {
+  $('#topbarActions').innerHTML = `<button class="btn btn-primary" id="addPayBtn">+ Add Payment</button>`;
+  $('#addPayBtn').addEventListener('click', () => openAddPaymentModal());
+
+  const monthStart = new Date();
+  monthStart.setDate(1);
+  paymentsUI.from = monthStart.toISOString().split('T')[0];
+  paymentsUI.to = todayISO();
+
+  $('#pageContent').innerHTML = `
+    <div class="toolbar">
+      <div class="search-box">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="paySearch" placeholder="Search by member or transaction ID...">
+      </div>
+      <input type="date" id="payFrom" value="${paymentsUI.from}" style="padding:10px 12px;border:1px solid var(--border);border-radius:8px">
+      <input type="date" id="payTo" value="${paymentsUI.to}" style="padding:10px 12px;border:1px solid var(--border);border-radius:8px">
+      <button class="btn btn-secondary" id="payFilterBtn">Apply</button>
+    </div>
+    <div class="stats-grid" id="payStats"></div>
+    <div class="card"><div id="paymentsTable"><div class="loading-overlay"><span class="spinner" style="border-color:var(--border);border-top-color:var(--accent)"></span> Loading...</div></div></div>
+  `;
+
+  let debounce;
+  $('#paySearch').addEventListener('input', e => {
+    paymentsUI.search = e.target.value;
+    clearTimeout(debounce);
+    debounce = setTimeout(loadPaymentsTable, 300);
+  });
+  $('#payFilterBtn').addEventListener('click', () => {
+    paymentsUI.from = $('#payFrom').value;
+    paymentsUI.to = $('#payTo').value;
+    loadPaymentsTable();
+  });
+
+  loadPaymentsTable();
+}
+
+async function loadPaymentsTable() {
+  const wrap = $('#paymentsTable');
+  if (!wrap) return;
+  wrap.innerHTML = '<div class="loading-overlay"><span class="spinner" style="border-color:var(--border);border-top-color:var(--accent)"></span> Loading...</div>';
+  try {
+    const list = await api.getPayments(state.gym.id, {
+      from: paymentsUI.from || null,
+      to: paymentsUI.to || null,
+      search: paymentsUI.search,
+      limit: 300,
+    });
+    const total = list.reduce((s, p) => s + Number(p.amount), 0);
+    const cash = list.filter(p => p.method === 'Cash').reduce((s,p)=>s+Number(p.amount),0);
+    const online = total - cash;
+    $('#payStats').innerHTML = `
+      <div class="stat-card"><div class="label">Total Received</div><div class="value green">${money(total)}</div><div class="sub">${list.length} payment${list.length===1?'':'s'}</div></div>
+      <div class="stat-card"><div class="label">Cash</div><div class="value">${money(cash)}</div></div>
+      <div class="stat-card"><div class="label">Online / Card / UPI</div><div class="value blue">${money(online)}</div></div>
+    `;
+
+    if (list.length === 0) {
+      wrap.innerHTML = '<div class="empty-state">No payments found</div>';
+      return;
+    }
+    wrap.innerHTML = `
+      <div class="table-wrap"><table>
+        <thead><tr><th>Date</th><th>Member</th><th>Amount</th><th>Method</th><th>Package</th><th>Transaction</th><th>Actions</th></tr></thead>
+        <tbody>
+          ${list.map(p => `<tr>
+            <td>${formatDate(p.date)}</td>
+            <td><strong>${escapeHtml(p.members?.name||'Unknown')}</strong><br><span style="font-size:12px;color:var(--text-muted)">${escapeHtml(p.members?.member_id||'')}</span></td>
+            <td><strong>${money(p.amount)}</strong></td>
+            <td><span class="badge badge-info">${escapeHtml(p.method||'—')}</span></td>
+            <td>${escapeHtml(p.package||'—')}</td>
+            <td>${escapeHtml(p.transaction_id||'—')}</td>
+            <td class="actions-cell">
+              <button class="btn btn-secondary btn-sm" onclick="openReceipt('${p.id}')">Receipt</button>
+              <button class="btn btn-danger btn-sm" onclick="deletePaymentUI('${p.id}')">Delete</button>
             </td>
-          </tr>`).join('')}</tbody>
-        </table></div>
-      ` : `<div class="empty"><div class="empty-icon">📦</div><div class="empty-title">No packages yet</div><div class="empty-sub">Add your first membership plan</div></div>`}
-    </div>
-  `;
+          </tr>`).join('')}
+        </tbody>
+      </table></div>
+    `;
+  } catch (err) {
+    console.error(err);
+    wrap.innerHTML = '<div class="empty-state">Failed to load payments</div>';
+  }
+}
+
+async function openAddPaymentModal(preMemberId = null) {
+  let members = state.membersList.length ? state.membersList : await api.getMembers(state.gym.id, { limit: 1000 });
+  const memberOptions = members.map(m =>
+    `<option value="${m.id}" ${preMemberId === m.id ? 'selected' : ''}>${escapeHtml(m.name)} — ${escapeHtml(m.member_id||'')}</option>`
+  ).join('');
+
+  openModal({
+    title: 'Add Payment',
+    body: `
+      <form id="paymentForm" class="form-grid">
+        <div class="form-group full"><label>Member *</label>
+          <select name="member_id" required>${memberOptions}</select></div>
+        <div class="form-group"><label>Date</label>
+          <input name="date" type="date" value="${todayISO()}"></div>
+        <div class="form-group"><label>Amount *</label>
+          <input name="amount" type="number" step="0.01" required></div>
+        <div class="form-group"><label>Method</label>
+          <select name="method">
+            <option>Cash</option><option>UPI</option><option>Card</option><option>Bank Transfer</option>
+          </select></div>
+        <div class="form-group"><label>Package</label>
+          <input name="package" placeholder="e.g. Monthly"></div>
+        <div class="form-group"><label>Transaction ID</label>
+          <input name="transaction_id" placeholder="Optional"></div>
+        <div class="form-group full"><label>Notes</label>
+          <textarea name="notes" placeholder="Optional"></textarea></div>
+      </form>
+    `,
+    footer: `
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="savePayBtn">Save Payment</button>
+    `
+  });
+
+  $('#savePayBtn').addEventListener('click', async () => {
+    const btn = $('#savePayBtn');
+    const data = {};
+    new FormData($('#paymentForm')).forEach((v, k) => data[k] = v || null);
+    if (!data.member_id) return toast('Select a member', 'error');
+    data.amount = parseFloat(data.amount);
+    if (!data.amount || data.amount <= 0) return toast('Enter a valid amount', 'error');
+    data.date = data.date || todayISO();
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Saving...';
+    try {
+      await api.createPayment(state.gym.id, data);
+      toast('Payment recorded');
+      closeModal();
+      if (state.currentPage === 'payments') loadPaymentsTable();
+      if (state.currentPage === 'members') loadMembersTable();
+      if (state.currentPage === 'dashboard') renderDashboard();
+    } catch (err) {
+      console.error(err);
+      toast(friendlyError(err), 'error');
+      btn.disabled = false;
+      btn.textContent = 'Save Payment';
+    }
+  });
+}
+
+async function deletePaymentUI(id) {
+  if (!confirm('Delete this payment? The member\'s paid amount will be adjusted.')) return;
+  try {
+    await api.deletePayment(id);
+    toast('Payment deleted');
+    if (state.currentPage === 'payments') loadPaymentsTable();
+    if (state.currentPage === 'members') loadMembersTable();
+  } catch (err) { toast(friendlyError(err), 'error'); }
 }
 
 /* ============================================================
- *  PAGE: ATTENDANCE
- * ============================================================ */
-function pageAttendance() {
-  const { attendance, members } = State;
-  const today = U.today();
-  const f = State.filters.attendance || {};
-  const filterDate = f.date || today;
-  const filterMember = f.member || '';
+   PAGE: PACKAGES (Memberships)
+   ============================================================ */
+async function renderPackages() {
+  $('#topbarActions').innerHTML = `<button class="btn btn-primary" id="addPkgBtn">+ Add Package</button>`;
+  $('#addPkgBtn').addEventListener('click', () => openPackageModal());
 
-  let list = attendance.filter(a => a.date === filterDate);
-  if (filterMember) list = list.filter(a => a.memberId === filterMember);
-  list.sort((a,b) => (b.checkIn||'').localeCompare(a.checkIn||''));
-
-  const presentIds = new Set(attendance.filter(a => a.date === today).map(a => a.memberId));
-  const present = presentIds.size;
-  const absent = Math.max(0, members.length - present);
-
-  const nameOf = id => (members.find(m => m.id === id) || {}).name || '—';
-
-  return `
-    <div class="page-head">
-      <div><h1 class="page-title">Attendance</h1><p class="page-sub">${U.fmtDate(filterDate)}</p></div>
-      <div class="page-actions">
-        <button class="btn btn-primary" data-act="mark-attendance">${I.check} Mark Attendance</button>
+  try {
+    state.packages = await api.getPackages(state.gym.id);
+    $('#pageContent').innerHTML = `
+      <div class="stats-grid">
+        ${state.packages.map(p => `
+          <div class="stat-card">
+            <div class="label">${escapeHtml(p.name)}</div>
+            <div class="value green">${money(p.price)}</div>
+            <div class="sub">${p.duration_months} month${p.duration_months===1?'':'s'}</div>
+            <div style="margin-top:12px;display:flex;gap:6px">
+              <button class="btn btn-secondary btn-sm" onclick="editPackage('${p.id}')">Edit</button>
+              <button class="btn btn-danger btn-sm" onclick="deletePackageUI('${p.id}')">Delete</button>
+            </div>
+          </div>
+        `).join('')}
       </div>
-    </div>
+    `;
+  } catch (err) { toast(friendlyError(err), 'error'); }
+}
 
-    <div class="stats">
-      <div class="stat"><div class="stat-label">Today's Total</div><div class="stat-value">${attendance.filter(a=>a.date===today).length}</div></div>
-      <div class="stat"><div class="stat-label">Present</div><div class="stat-value" style="color:#4ade80">${present}</div></div>
-      <div class="stat"><div class="stat-label">Absent</div><div class="stat-value" style="color:#f87171">${absent}</div></div>
-    </div>
+function openPackageModal(pkg = null) {
+  const p = pkg || { name: '', duration_months: 1, price: 0, description: '' };
+  openModal({
+    title: pkg ? 'Edit Package' : 'Add Package',
+    body: `
+      <form id="pkgForm" class="form-grid">
+        <div class="form-group full"><label>Name *</label>
+          <input name="name" required value="${escapeHtml(p.name)}"></div>
+        <div class="form-group"><label>Duration (months) *</label>
+          <input name="duration_months" type="number" min="1" required value="${p.duration_months}"></div>
+        <div class="form-group"><label>Price *</label>
+          <input name="price" type="number" step="0.01" min="0" required value="${p.price}"></div>
+        <div class="form-group full"><label>Description</label>
+          <textarea name="description">${escapeHtml(p.description||'')}</textarea></div>
+      </form>
+    `,
+    footer: `
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="savePkgBtn">Save</button>
+    `
+  });
+  $('#savePkgBtn').addEventListener('click', async () => {
+    const data = {};
+    new FormData($('#pkgForm')).forEach((v,k)=>data[k]=v);
+    data.duration_months = parseInt(data.duration_months);
+    data.price = parseFloat(data.price);
+    try {
+      if (pkg) await api.updatePackage(pkg.id, data);
+      else await api.createPackage(state.gym.id, data);
+      toast('Package saved');
+      closeModal();
+      renderPackages();
+    } catch (err) { toast(friendlyError(err), 'error'); }
+  });
+}
 
-    <div class="toolbar">
-      <input type="date" class="input" id="attDate" value="${filterDate}" style="width:auto">
-      <select id="attMember" style="min-width:200px">
-        <option value="">All members</option>
-        ${members.map(m => `<option value="${m.id}" ${filterMember===m.id?'selected':''}>${U.esc(m.name)}</option>`).join('')}
-      </select>
-    </div>
-
-    <div class="table-wrap">
-      ${list.length ? `
-        <div class="table-scroll"><table>
-          <thead><tr><th>Member</th><th>Date</th><th>Check In</th><th>Check Out</th><th style="width:60px"></th></tr></thead>
-          <tbody>${list.map(a => `<tr>
-            <td class="font-600">${U.esc(nameOf(a.memberId))}</td>
-            <td class="text-dim">${U.fmtDate(a.date)}</td>
-            <td>${U.esc(a.checkIn||'—')}</td>
-            <td>${U.esc(a.checkOut||'—')}</td>
-            <td><button class="btn btn-icon btn-ghost" data-act="del-att" data-id="${a.id}">${I.trash}</button></td>
-          </tr>`).join('')}</tbody>
-        </table></div>
-      ` : `<div class="empty"><div class="empty-icon">📅</div><div class="empty-title">No attendance records</div><div class="empty-sub">Mark attendance to see records here</div></div>`}
-    </div>
-  `;
+async function editPackage(id) {
+  const pkg = state.packages.find(p => p.id === id);
+  if (pkg) openPackageModal(pkg);
+}
+async function deletePackageUI(id) {
+  if (!confirm('Deactivate this package?')) return;
+  try {
+    await api.deletePackage(id);
+    toast('Package deactivated');
+    renderPackages();
+  } catch (err) { toast(friendlyError(err), 'error'); }
 }
 
 /* ============================================================
- *  PAGE: PAYMENTS
- * ============================================================ */
-function pagePayments() {
-  const { payments, members, settings } = State;
-  const f = State.filters.payments || {};
-  const search = (f.search || '').toLowerCase();
-  const method = f.method || '';
-
-  const nameOf = id => (members.find(m => m.id === id) || {}).name || '—';
-
-  let list = [...payments];
-  if (search) list = list.filter(p => nameOf(p.memberId).toLowerCase().includes(search) || (p.transactionId||'').toLowerCase().includes(search));
-  if (method) list = list.filter(p => p.method === method);
-  list.sort((a,b) => new Date(b.date) - new Date(a.date));
-
-  const total = list.reduce((s,p) => s + Number(p.amount||0), 0);
-
-  return `
-    <div class="page-head">
-      <div><h1 class="page-title">Payments</h1><p class="page-sub">${list.length} records · ${U.fmtMoney(total, settings.currency)} total</p></div>
-      <div class="page-actions">
-        <button class="btn btn-primary" data-act="add-payment">${I.plus} Record Payment</button>
-      </div>
-    </div>
-
-    <div class="toolbar">
-      <input class="input" id="paySearch" placeholder="Search member or transaction ID…" value="${U.esc(f.search||'')}" style="flex:1;">
-      <select id="payMethod">
-        <option value="">All methods</option>
-        ${['Cash','UPI','Card','Bank Transfer'].map(m => `<option ${method===m?'selected':''}>${m}</option>`).join('')}
-      </select>
-    </div>
-
-    <div class="table-wrap">
-      ${list.length ? `
-        <div class="table-scroll"><table>
-          <thead><tr><th>Member</th><th>Date</th><th>Amount</th><th>Method</th><th>Package</th><th>Ref</th><th style="width:100px"></th></tr></thead>
-          <tbody>${list.map(p => `<tr>
-            <td class="font-600">${U.esc(nameOf(p.memberId))}</td>
-            <td class="text-dim">${U.fmtDate(p.date)}</td>
-            <td class="font-600">${U.fmtMoney(p.amount, settings.currency)}</td>
-            <td><span class="badge">${U.esc(p.method||'—')}</span></td>
-            <td class="text-dim">${U.esc(p.package||'—')}</td>
-            <td class="text-xs text-muted">${U.esc(p.transactionId||'—')}</td>
-            <td>
-              <div class="flex gap-1">
-                <button class="btn btn-icon btn-ghost" data-act="edit-payment" data-id="${p.id}">${I.edit}</button>
-                <button class="btn btn-icon btn-ghost" data-act="delete-payment" data-id="${p.id}">${I.trash}</button>
-              </div>
-            </td>
-          </tr>`).join('')}</tbody>
-        </table></div>
-      ` : `<div class="empty"><div class="empty-icon">💳</div><div class="empty-title">No payments found</div><div class="empty-sub">Record a payment to see it here</div></div>`}
-    </div>
-  `;
-}
-
-/* ============================================================
- *  PAGE: EXPIRY
- * ============================================================ */
-function pageExpiry() {
-  const { members, settings } = State;
-  const warn = Number(settings.expiryWarningDays) || 7;
-
-  const groups = [
-    { label:'Expired', list: members.filter(m => U.daysLeft(m.endDate) < 0) },
-    { label:'Expiring within 7 days',  list: members.filter(m => { const d = U.daysLeft(m.endDate); return d >= 0 && d <= 7; }) },
-    { label:'Expiring within 15 days', list: members.filter(m => { const d = U.daysLeft(m.endDate); return d > 7 && d <= 15; }) },
-    { label:'Expiring within 30 days', list: members.filter(m => { const d = U.daysLeft(m.endDate); return d > 15 && d <= 30; }) }
+   PAGE: EXPIRY
+   ============================================================ */
+async function renderExpiry() {
+  const buckets = await api.getExpiryBuckets(state.gym.id);
+  const sections = [
+    { title: 'Expired', key: 'expired', cls: 'badge-expired' },
+    { title: 'Expiring in 7 Days', key: 'd7', cls: 'badge-soon' },
+    { title: 'Expiring in 15 Days', key: 'd15', cls: 'badge-info' },
+    { title: 'Expiring in 30 Days', key: 'd30', cls: 'badge-gray' },
   ];
+  $('#pageContent').innerHTML = sections.map(s => {
+    const list = buckets[s.key] || [];
+    return `
+      <div class="card" style="margin-bottom:20px">
+        <div class="card-header"><h3>${s.title} <span class="badge ${s.cls}">${list.length}</span></h3></div>
+        <div class="card-body" style="padding:0">
+          ${list.length === 0
+            ? '<div class="empty-state">None</div>'
+            : `<div class="table-wrap"><table>
+                <thead><tr><th>Member</th><th>Phone</th><th>Package</th><th>Expiry</th><th>Days</th><th>Pending</th><th></th></tr></thead>
+                <tbody>
+                  ${list.map(m => {
+                    const rem = daysBetween(todayISO(), m.end_date);
+                    const waPhone = (m.phone||'').replace(/\D/g,'');
+                    const msg = encodeURIComponent(`Hello ${m.name}, your ${state.settings.gym_name} membership is expiring on ${formatDate(m.end_date)}. Please contact us for renewal. Thank you.`);
+                    return `<tr>
+                      <td><strong>${escapeHtml(m.name)}</strong><br><span style="font-size:12px;color:var(--text-muted)">${escapeHtml(m.member_id||'')}</span></td>
+                      <td>${escapeHtml(m.phone||'—')}</td>
+                      <td>${escapeHtml(m.packages?.name || '—')}</td>
+                      <td>${formatDate(m.end_date)}</td>
+                      <td>${rem < 0 ? `<span class="badge badge-expired">${Math.abs(rem)}d ago</span>` : `<span class="badge badge-info">${rem}d</span>`}</td>
+                      <td>${money(Math.max(0, getPending(m)))}</td>
+                      <td class="actions-cell">
+                        <button class="btn btn-primary btn-sm" onclick="openRenewModal('${m.id}')">Renew</button>
+                        ${waPhone ? `<a class="btn btn-secondary btn-sm" style="background:#25D366;color:#fff;border:none" href="https://wa.me/${waPhone}?text=${msg}" target="_blank">WA</a>` : ''}
+                      </td>
+                    </tr>`;
+                  }).join('')}
+                </tbody></table></div>`}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
 
-  return `
-    <div class="page-head">
-      <div><h1 class="page-title">Membership Expiry</h1><p class="page-sub">Manage renewals and reminders</p></div>
+/* ============================================================
+   PAGE: REPORTS
+   ============================================================ */
+let reportsUI = { range: 'month', from: '', to: '' };
+
+async function renderReports() {
+  const now = new Date();
+  const fmt = d => d.toISOString().split('T')[0];
+  const monthStart = fmt(new Date(now.getFullYear(), now.getMonth(), 1));
+  const today = fmt(now);
+
+  $('#pageContent').innerHTML = `
+    <div class="toolbar">
+      <div class="filter-tabs" id="reportFilters">
+        <button data-r="today">Today</button>
+        <button data-r="week">This Week</button>
+        <button data-r="month" class="active">This Month</button>
+        <button data-r="custom">Custom</button>
+      </div>
+      <input type="date" id="repFrom" value="${monthStart}" style="padding:10px 12px;border:1px solid var(--border);border-radius:8px">
+      <input type="date" id="repTo" value="${today}" style="padding:10px 12px;border:1px solid var(--border);border-radius:8px">
+      <button class="btn btn-secondary" id="repApply">Apply</button>
     </div>
-    ${groups.map(g => `
-      <div class="table-wrap mb-3">
-        <div class="table-head">
-          <div>
-            <div class="card-title">${g.label}</div>
-            <div class="card-sub">${g.list.length} member${g.list.length !== 1 ? 's' : ''}</div>
+    <div id="reportBody"><div class="loading-overlay"><span class="spinner" style="border-color:var(--border);border-top-color:var(--accent)"></span> Loading...</div></div>
+  `;
+
+  $('#reportFilters button').forEach(b => b.addEventListener('click', () => {
+    reportsUI.range = b.dataset.r;
+    $$('#reportFilters button').forEach(x => x.classList.toggle('active', x === b));
+    const today = fmt(new Date());
+    if (b.dataset.r === 'today') { $('#repFrom').value = today; $('#repTo').value = today; }
+    else if (b.dataset.r === 'week') {
+      const wk = new Date(); wk.setDate(wk.getDate() - 7);
+      $('#repFrom').value = fmt(wk); $('#repTo').value = today;
+    } else if (b.dataset.r === 'month') {
+      $('#repFrom').value = monthStart; $('#repTo').value = today;
+    }
+    loadReport();
+  }));
+  $('#repApply').addEventListener('click', loadReport);
+  loadReport();
+}
+
+async function loadReport() {
+  const from = $('#repFrom').value;
+  const to = $('#repTo').value;
+  try {
+    const r = await api.getReport(state.gym.id, from, to);
+    $('#reportBody').innerHTML = `
+      <div class="stats-grid">
+        <div class="stat-card"><div class="label">Total Members</div><div class="value">${r.totalMembers}</div></div>
+        <div class="stat-card"><div class="label">Active Members</div><div class="value green">${r.activeMembers}</div></div>
+        <div class="stat-card"><div class="label">Expired Members</div><div class="value red">${r.expiredMembers}</div></div>
+        <div class="stat-card"><div class="label">New in Period</div><div class="value blue">${r.newMembers}</div><div class="sub">${formatDate(from)} → ${formatDate(to)}</div></div>
+        <div class="stat-card"><div class="label">Revenue</div><div class="value green">${money(r.revenue)}</div></div>
+        <div class="stat-card"><div class="label">Pending Payments</div><div class="value orange">${money(r.pendingPayments)}</div></div>
+        <div class="stat-card"><div class="label">Attendance</div><div class="value">${r.attendance}</div><div class="sub">Check-ins in period</div></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><h3>Revenue by Payment Method</h3></div>
+        <div class="card-body">
+          ${Object.keys(r.byMethod).length === 0 ? '<div style="color:var(--text-muted)">No payments in this period</div>' :
+            `<div class="table-wrap"><table>
+              <thead><tr><th>Method</th><th>Amount</th></tr></thead>
+              <tbody>
+                ${Object.entries(r.byMethod).map(([k,v]) => `<tr><td>${escapeHtml(k)}</td><td><strong>${money(v)}</strong></td></tr>`).join('')}
+              </tbody>
+            </table></div>`}
+        </div>
+      </div>
+    `;
+  } catch (err) {
+    console.error(err);
+    $('#reportBody').innerHTML = '<div class="empty-state">Failed to load report</div>';
+  }
+}
+
+/* ============================================================
+   PAGE: SETTINGS
+   ============================================================ */
+async function renderSettings() {
+  try {
+    state.settings = await api.getSettings(state.gym.id);
+    const s = state.settings;
+    $('#pageContent').innerHTML = `
+      <div class="card" style="max-width:800px">
+        <div class="card-header"><h3>Gym Settings</h3></div>
+        <div class="card-body">
+          <form id="settingsForm" class="form-grid">
+            <div class="form-group full"><label>Gym Name</label>
+              <input name="gym_name" value="${escapeHtml(s.gym_name||'')}"></div>
+            <div class="form-group"><label>Phone</label>
+              <input name="phone" value="${escapeHtml(s.phone||'')}"></div>
+            <div class="form-group"><label>Email</label>
+              <input name="email" type="email" value="${escapeHtml(s.email||'')}"></div>
+            <div class="form-group"><label>WhatsApp</label>
+              <input name="whatsapp" value="${escapeHtml(s.whatsapp||'')}"></div>
+            <div class="form-group"><label>Currency</label>
+              <input name="currency" value="${escapeHtml(s.currency||'₹')}"></div>
+            <div class="form-group full"><label>Address</label>
+              <textarea name="address">${escapeHtml(s.address||'')}</textarea></div>
+            <div class="form-group"><label>Warning Days (expiry)</label>
+              <input name="warning_days" type="number" min="1" value="${s.warning_days||7}"></div>
+            <div class="form-group"><label>Logo URL</label>
+              <input name="logo_url" value="${escapeHtml(s.logo_url||'')}" placeholder="https://..."></div>
+            <div class="form-group"><label>Opening Time</label>
+              <input name="opening_time" type="time" value="${s.opening_time||'06:00'}"></div>
+            <div class="form-group"><label>Closing Time</label>
+              <input name="closing_time" type="time" value="${s.closing_time||'22:00'}"></div>
+          </form>
+          <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border);display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between">
+            <div>
+              <button class="btn btn-secondary" id="seedDemoBtn">Seed Demo Data</button>
+            </div>
+            <button class="btn btn-primary" id="saveSettingsBtn">Save Settings</button>
           </div>
         </div>
-        ${g.list.length ? `
-          <div class="table-scroll"><table>
-            <thead><tr><th>Name</th><th>Mobile</th><th>Package</th><th>Expiry</th><th>Days</th><th style="width:220px"></th></tr></thead>
-            <tbody>${g.list.map(m => {
-              const d = U.daysLeft(m.endDate);
-              const badge = d < 0 ? 'badge-danger' : 'badge-warning';
-              const msg = `Hello ${m.name}, your gym membership is expiring on ${U.fmtDate(m.endDate)}. Please contact us for renewal. Thank you.`;
-              return `<tr>
-                <td class="font-600">${U.esc(m.name)}</td>
-                <td class="text-dim">${U.esc(m.phone)}</td>
-                <td>${U.esc(m.package||'—')}</td>
-                <td>${U.fmtDate(m.endDate)}</td>
-                <td><span class="badge ${badge}">${d < 0 ? 'Expired' : d + 'd'}</span></td>
-                <td>
-                  <div class="flex gap-1">
-                    <button class="btn btn-sm" data-act="renew" data-id="${m.id}">${I.refresh} Renew</button>
-                    <button class="btn btn-sm" data-act="wa" data-id="${m.id}" data-msg="${U.esc(msg)}">${I.whatsapp} WhatsApp</button>
-                  </div>
-                </td>
-              </tr>`;
-            }).join('')}</tbody>
-          </table></div>
-        ` : `<div class="empty"><div class="empty-icon">✓</div><div class="empty-title">Nothing here</div></div>`}
       </div>
-    `).join('')}
-  `;
-}
+    `;
 
-/* ============================================================
- *  PAGE: REPORTS
- * ============================================================ */
-function pageReports() {
-  const { members, payments, attendance, settings } = State;
-  const f = State.filters.reports || {};
-  const range = f.range || 'month';
-  const today = U.today();
-
-  let start = today, end = today;
-  if (range === 'today') { /* both today */ }
-  else if (range === 'week')  { start = new Date(Date.now() - 7*864e5).toISOString().slice(0,10); }
-  else if (range === 'month') { start = new Date(Date.now() - 30*864e5).toISOString().slice(0,10); }
-  else if (range === 'custom') { start = f.start || today; end = f.end || today; }
-
-  const inRange = d => d >= start && d <= end;
-  const periodPayments = payments.filter(p => inRange(p.date));
-  const periodAttendance = attendance.filter(a => inRange(a.date));
-  const newMembers = members.filter(m => inRange(m.joiningDate || '')).length;
-  const revenue = periodPayments.reduce((s,p) => s + Number(p.amount||0), 0);
-  const pending = members.reduce((s,m) => s + Number(m.pending||0), 0);
-  const active = members.filter(m => U.status(m.endDate, settings.expiryWarningDays) === 'active').length;
-  const expired = members.filter(m => U.status(m.endDate, settings.expiryWarningDays) === 'expired').length;
-
-  return `
-    <div class="page-head">
-      <div><h1 class="page-title">Reports</h1><p class="page-sub">${U.fmtDate(start)} → ${U.fmtDate(end)}</p></div>
-    </div>
-
-    <div class="toolbar">
-      ${[['today','Today'],['week','This Week'],['month','This Month'],['custom','Custom']].map(([k,l]) => `
-        <button class="btn ${range===k?'btn-primary':''}" data-range="${k}">${l}</button>
-      `).join('')}
-      ${range === 'custom' ? `
-        <input type="date" class="input" id="repStart" value="${start}" style="width:auto">
-        <input type="date" class="input" id="repEnd" value="${end}" style="width:auto">
-        <button class="btn btn-primary" id="repApply">Apply</button>
-      ` : ''}
-    </div>
-
-    <div class="stats">
-      <div class="stat"><div class="stat-label">Total Members</div><div class="stat-value">${members.length}</div></div>
-      <div class="stat"><div class="stat-label">New in Period</div><div class="stat-value">${newMembers}</div></div>
-      <div class="stat"><div class="stat-label">Active</div><div class="stat-value" style="color:#4ade80">${active}</div></div>
-      <div class="stat"><div class="stat-label">Expired</div><div class="stat-value" style="color:#f87171">${expired}</div></div>
-      <div class="stat"><div class="stat-label">Revenue</div><div class="stat-value">${U.fmtMoney(revenue, settings.currency)}</div></div>
-      <div class="stat"><div class="stat-label">Pending</div><div class="stat-value" style="color:#fbbf24">${U.fmtMoney(pending, settings.currency)}</div></div>
-      <div class="stat"><div class="stat-label">Attendance</div><div class="stat-value">${periodAttendance.length}</div></div>
-      <div class="stat"><div class="stat-label">Payments</div><div class="stat-value">${periodPayments.length}</div></div>
-    </div>
-  `;
-}
-
-/* ============================================================
- *  PAGE: SETTINGS
- * ============================================================ */
-function pageSettings() {
-  const s = State.settings;
-  return `
-    <div class="page-head">
-      <div><h1 class="page-title">Settings</h1><p class="page-sub">Gym information and preferences</p></div>
-    </div>
-
-    <div class="card mb-3">
-      <div class="card-title mb-2">Gym Information</div>
-      <div class="form-grid">
-        <div class="field"><label>Gym Name</label><input id="set_gymName" value="${U.esc(s.gymName||'')}"></div>
-        <div class="field"><label>Phone</label><input id="set_phone" value="${U.esc(s.phone||'')}"></div>
-        <div class="field"><label>Email</label><input id="set_email" value="${U.esc(s.email||'')}"></div>
-        <div class="field"><label>WhatsApp Number</label><input id="set_whatsapp" value="${U.esc(s.whatsapp||'')}"></div>
-        <div class="field full"><label>Address</label><input id="set_address" value="${U.esc(s.address||'')}"></div>
-      </div>
-    </div>
-
-    <div class="card mb-3">
-      <div class="card-title mb-2">Preferences</div>
-      <div class="form-grid">
-        <div class="field"><label>Currency Symbol</label><input id="set_currency" value="${U.esc(s.currency||'₹')}"></div>
-        <div class="field"><label>Expiry Warning (days)</label><input type="number" id="set_expiryWarningDays" value="${U.esc(s.expiryWarningDays||7)}"></div>
-        <div class="field"><label>Opening Time</label><input type="time" id="set_openingTime" value="${U.esc(s.openingTime||'06:00')}"></div>
-        <div class="field"><label>Closing Time</label><input type="time" id="set_closingTime" value="${U.esc(s.closingTime||'22:00')}"></div>
-      </div>
-    </div>
-
-    <button class="btn btn-primary" id="saveSettings">Save Settings</button>
-  `;
-}
-
-/* ============================================================
- *  PAGE EVENT BINDINGS
- * ============================================================ */
-function bindPageEvents() {
-  const main = document.getElementById('mainRoot');
-
-  // Generic data-act handlers
-  main.querySelectorAll('[data-act]').forEach(el => {
-    el.onclick = async () => {
-      const act = el.dataset.act;
-      const id = el.dataset.id;
+    $('#saveSettingsBtn').addEventListener('click', async () => {
+      const btn = $('#saveSettingsBtn');
+      const data = {};
+      new FormData($('#settingsForm')).forEach((v,k) => data[k] = v || null);
+      data.warning_days = parseInt(data.warning_days) || 7;
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span> Saving...';
       try {
-        if (act === 'refresh')         return render();
-        if (act === 'add-member')      return openMemberModal();
-        if (act === 'edit-member')     return openMemberModal(id);
-        if (act === 'view-member')     return viewMember(id);
-        if (act === 'delete-member')   return deleteMember(id);
-        if (act === 'add-package')     return openPackageModal();
-        if (act === 'edit-package')    return openPackageModal(id);
-        if (act === 'delete-package')  return deletePackage(id);
-        if (act === 'mark-attendance') return openAttendanceModal();
-        if (act === 'del-att')         return deleteAttendance(id);
-        if (act === 'add-payment')     return openPaymentModal();
-        if (act === 'edit-payment')    return openPaymentModal(id);
-        if (act === 'delete-payment')  return deletePayment(id);
-        if (act === 'renew')           return openRenewModal(id);
-        if (act === 'go-expiry')       { State.page = 'expiry'; return render(); }
-        if (act === 'wa') {
-          const m = State.members.find(x => x.id === id);
-          if (m) U.whatsapp(m.phone, el.dataset.msg);
-        }
-      } catch (e) {
-        console.error(e);
-        U.toast(e.message || 'Something went wrong', 'error');
+        state.settings = await api.updateSettings(s.id, data);
+        toast('Settings saved');
+        document.title = `${state.settings.gym_name} — VelvetNet CRM`;
+      } catch (err) { toast(friendlyError(err), 'error'); }
+      btn.disabled = false;
+      btn.textContent = 'Save Settings';
+    });
+
+    $('#seedDemoBtn').addEventListener('click', async () => {
+      if (!confirm('Seed demo data? This adds 20 sample members, packages, attendance, and payments. Skipped if data already exists.')) return;
+      try {
+        const { error } = await sb.rpc('seed_demo_data');
+        if (error) throw error;
+        toast('Demo data seeded');
+        // Reload app state
+        state.packages = await api.getPackages(state.gym.id);
+        state.settings = await api.getSettings(state.gym.id);
+        navigate('dashboard');
+      } catch (err) {
+        console.error(err);
+        toast('Could not seed demo data: ' + friendlyError(err), 'error');
       }
-    };
-  });
-
-  // Members search/filter
-  const ms = document.getElementById('memberSearch');
-  if (ms) ms.oninput = e => { State.filters.members = { ...(State.filters.members||{}), search:e.target.value }; render(); };
-  const mst = document.getElementById('memberStatus');
-  if (mst) mst.onchange = e => { State.filters.members = { ...(State.filters.members||{}), status:e.target.value }; render(); };
-
-  // Attendance filters
-  const ad = document.getElementById('attDate');
-  if (ad) ad.onchange = e => { State.filters.attendance = { ...(State.filters.attendance||{}), date:e.target.value }; render(); };
-  const am = document.getElementById('attMember');
-  if (am) am.onchange = e => { State.filters.attendance = { ...(State.filters.attendance||{}), member:e.target.value }; render(); };
-
-  // Payments filters
-  const ps = document.getElementById('paySearch');
-  if (ps) ps.oninput = e => { State.filters.payments = { ...(State.filters.payments||{}), search:e.target.value }; render(); };
-  const pm = document.getElementById('payMethod');
-  if (pm) pm.onchange = e => { State.filters.payments = { ...(State.filters.payments||{}), method:e.target.value }; render(); };
-
-  // Reports
-  main.querySelectorAll('[data-range]').forEach(b => {
-    b.onclick = () => { State.filters.reports = { ...(State.filters.reports||{}), range:b.dataset.range }; render(); };
-  });
-  const repApply = document.getElementById('repApply');
-  if (repApply) repApply.onclick = () => {
-    State.filters.reports = {
-      ...(State.filters.reports||{}),
-      start: document.getElementById('repStart').value,
-      end: document.getElementById('repEnd').value
-    };
-    render();
-  };
-
-  // Settings save
-  const ss = document.getElementById('saveSettings');
-  if (ss) ss.onclick = async () => {
-    const data = {
-      gymName: document.getElementById('set_gymName').value,
-      phone: document.getElementById('set_phone').value,
-      email: document.getElementById('set_email').value,
-      whatsapp: document.getElementById('set_whatsapp').value,
-      address: document.getElementById('set_address').value,
-      currency: document.getElementById('set_currency').value || '₹',
-      expiryWarningDays: Number(document.getElementById('set_expiryWarningDays').value) || 7,
-      openingTime: document.getElementById('set_openingTime').value,
-      closingTime: document.getElementById('set_closingTime').value
-    };
-    U.loading(true);
-    const r = await API.updateSettings(data);
-    U.loading(false);
-    if (r.success) { U.toast('Settings saved', 'success'); render(); }
-    else U.toast(r.error || 'Save failed', 'error');
-  };
+    });
+  } catch (err) { toast(friendlyError(err), 'error'); }
 }
 
 /* ============================================================
- *  MODALS
- * ============================================================ */
-function openModal(html) {
-  const root = document.getElementById('modalRoot');
-  root.innerHTML = `<div class="modal-overlay"><div class="modal">${html}</div></div>`;
-  const overlay = root.querySelector('.modal-overlay');
-  overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
-  overlay.querySelectorAll('[data-close]').forEach(b => b.onclick = closeModal);
-}
-function closeModal() { document.getElementById('modalRoot').innerHTML = ''; }
+   RENEW MEMBERSHIP
+   ============================================================ */
+async function openRenewModal(memberId) {
+  const member = await api.getMember(memberId);
+  const currentPkg = state.packages.find(p => p.id === member.package_id);
+  const pkgOptions = state.packages.map(p =>
+    `<option value="${p.id}" data-dur="${p.duration_months}" data-price="${p.price}"
+      ${member.package_id === p.id ? 'selected' : ''}>${escapeHtml(p.name)} — ${money(p.price)} / ${p.duration_months} mo</option>`
+  ).join('');
 
-/* ---------- MEMBER ---------- */
-function openMemberModal(id) {
-  const m = id ? State.members.find(x => x.id === id) : null;
-  const pkgs = State.packages.filter(p => p.status !== 'inactive');
-  const pkgOpts = pkgs.map(p => `<option value="${U.esc(p.name)}" ${m?.package===p.name?'selected':''}>${U.esc(p.name)} · ${p.duration}d · ${U.fmtMoney(p.price, State.settings.currency)}</option>`).join('');
-
-  openModal(`
-    <div class="modal-head">
-      <div class="modal-title">${m ? 'Edit Member' : 'Add New Member'}</div>
-      <button class="modal-close" data-close>✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-grid">
-        <div class="field"><label>Full Name *</label><input id="m_name" value="${U.esc(m?.name||'')}" placeholder="Enter full name"></div>
-        <div class="field"><label>Mobile *</label><input id="m_phone" value="${U.esc(m?.phone||'')}" placeholder="10-digit mobile"></div>
-        <div class="field"><label>Email</label><input type="email" id="m_email" value="${U.esc(m?.email||'')}"></div>
-        <div class="field"><label>Gender</label>
-          <select id="m_gender">
-            <option value="">Select</option>
-            ${['Male','Female','Other'].map(g => `<option ${m?.gender===g?'selected':''}>${g}</option>`).join('')}
-          </select>
-        </div>
-        <div class="field"><label>Date of Birth</label><input type="date" id="m_dob" value="${U.esc(m?.dob||'')}"></div>
-        <div class="field"><label>Joining Date</label><input type="date" id="m_joiningDate" value="${U.esc(m?.joiningDate||U.today())}"></div>
-        <div class="field full"><label>Emergency Contact</label><input id="m_emergencyContact" value="${U.esc(m?.emergencyContact||'')}" placeholder="Name & mobile"></div>
-        <div class="field full"><label>Notes</label><textarea id="m_notes" placeholder="Any additional notes…">${U.esc(m?.notes||'')}</textarea></div>
+  openModal({
+    title: `Renew — ${member.name}`,
+    wide: true,
+    body: `
+      <div class="info-grid" style="margin-bottom:20px">
+        <div class="info-item"><div class="lbl">Current Package</div><div class="val">${escapeHtml(currentPkg?.name||'—')}</div></div>
+        <div class="info-item"><div class="lbl">Current Expiry</div><div class="val">${formatDate(member.end_date)}</div></div>
       </div>
-
-      <div style="border-top:1px solid var(--border);margin:1.25rem 0;"></div>
-      <div class="card-title mb-2">Membership</div>
-      <div class="form-grid">
-        <div class="field full"><label>Package</label>
-          <select id="m_package">${pkgOpts || '<option value="">No packages available</option>'}</select>
+      <form id="renewForm" class="form-grid">
+        <div class="form-group"><label>New Package *</label>
+          <select name="package_id" id="renewPkgSelect" required>${pkgOptions}</select></div>
+        <div class="form-group"><label>New Start Date *</label>
+          <input name="start_date" id="renewStart" type="date" required
+            value="${member.end_date && member.end_date >= todayISO() ? member.end_date : todayISO()}"></div>
+        <div class="form-group"><label>New End Date</label>
+          <input name="end_date" id="renewEnd" type="date" readonly></div>
+        <div class="form-group"><label>Price</label>
+          <input name="amount" id="renewAmount" type="number" step="0.01"></div>
+        <div class="form-group"><label>Payment Amount</label>
+          <input name="payment_amount" id="renewPayment" type="number" step="0.01" value="0"></div>
+        <div class="form-group"><label>Payment Method</label>
+          <select name="payment_method">
+            <option>Cash</option><option>UPI</option><option>Card</option><option>Bank Transfer</option>
+          </select></div>
+        <div class="form-group full" style="background:var(--bg);padding:12px;border-radius:8px">
+          <div class="lbl" style="font-size:11px;color:var(--text-muted);text-transform:uppercase;font-weight:600">New Pending Amount</div>
+          <div id="renewPendingDisplay" style="font-size:20px;font-weight:700;color:var(--danger);margin-top:4px">${money(0)}</div>
         </div>
-        <div class="field"><label>Start Date</label><input type="date" id="m_startDate" value="${U.esc(m?.startDate||U.today())}"></div>
-        <div class="field"><label>End Date</label><input type="date" id="m_endDate" value="${U.esc(m?.endDate||'')}"></div>
-        <div class="field"><label>Total Amount</label><input type="number" id="m_amount" value="${U.esc(m?.amount||0)}" min="0"></div>
-        <div class="field"><label>Amount Paid</label><input type="number" id="m_paid" value="${U.esc(m?.paid||0)}" min="0"></div>
-        <div class="field"><label>Pending (auto)</label><input id="m_pending" value="${U.esc(m?.pending||0)}" readonly style="opacity:.7"></div>
-      </div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn" data-close>Cancel</button>
-      <button class="btn btn-primary" id="m_save">${m ? 'Update' : 'Create'} Member</button>
-    </div>
-  `);
+      </form>
+    `,
+    footer: `
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="renewSubmitBtn">Renew Membership</button>
+    `
+  });
 
-  const pkgSel  = document.getElementById('m_package');
-  const startInp= document.getElementById('m_startDate');
-  const endInp  = document.getElementById('m_endDate');
-  const amountInp = document.getElementById('m_amount');
-  const paidInp = document.getElementById('m_paid');
-  const pendInp = document.getElementById('m_pending');
+  const pkgSel = $('#renewPkgSelect'), startInp = $('#renewStart'), endInp = $('#renewEnd'),
+        amtInp = $('#renewAmount'), payInp = $('#renewPayment'), pendDisplay = $('#renewPendingDisplay');
 
-  function syncFromPackage() {
-    const p = State.packages.find(x => x.name === pkgSel.value);
-    if (!p) return;
-    if (startInp.value) {
-      const end = new Date(startInp.value);
-      end.setDate(end.getDate() + Number(p.duration));
-      endInp.value = end.toISOString().slice(0,10);
-    }
-    amountInp.value = p.price;
+  function recalc() {
+    const opt = pkgSel.selectedOptions[0];
+    if (!opt) return;
+    const dur = parseInt(opt.dataset.dur);
+    const price = parseFloat(opt.dataset.price);
+    amtInp.value = price;
+    const end = new Date(startInp.value + 'T00:00:00');
+    end.setMonth(end.getMonth() + dur);
+    endInp.value = end.toISOString().split('T')[0];
     updatePending();
   }
   function updatePending() {
-    const a = Number(amountInp.value) || 0;
-    const p = Number(paidInp.value) || 0;
-    pendInp.value = Math.max(0, a - p);
+    const amt = parseFloat(amtInp.value) || 0;
+    const paid = parseFloat(payInp.value) || 0;
+    pendDisplay.textContent = money(Math.max(0, amt - paid));
+    pendDisplay.style.color = (amt - paid) > 0 ? 'var(--danger)' : 'var(--accent)';
   }
-
-  pkgSel.onchange = syncFromPackage;
-  startInp.onchange = syncFromPackage;
-  amountInp.oninput = updatePending;
-  paidInp.oninput = updatePending;
-
-  document.getElementById('m_save').onclick = async () => {
-    const name = document.getElementById('m_name').value.trim();
-    const phone = document.getElementById('m_phone').value.trim();
-    if (!name)  return U.toast('Full name is required', 'error');
-    if (!phone) return U.toast('Mobile number is required', 'error');
-
-    const amount = Number(amountInp.value) || 0;
-    const paid = Number(paidInp.value) || 0;
-
-    const data = {
-      name, phone,
-      email: document.getElementById('m_email').value.trim(),
-      gender: document.getElementById('m_gender').value,
-      dob: document.getElementById('m_dob').value,
-      joiningDate: document.getElementById('m_joiningDate').value,
-      emergencyContact: document.getElementById('m_emergencyContact').value.trim(),
-      notes: document.getElementById('m_notes').value.trim(),
-      package: pkgSel.value,
-      startDate: startInp.value,
-      endDate: endInp.value,
-      amount, paid,
-      pending: Math.max(0, amount - paid),
-      status: U.status(endInp.value, State.settings.expiryWarningDays)
-    };
-
-    U.loading(true);
-    let r;
-    if (m) r = await API.updateMember(m.id, data);
-    else {
-      data.id = U.uid('m');
-      data.createdAt = new Date().toISOString();
-      r = await API.addMember(data);
-    }
-    U.loading(false);
-    if (r.success) {
-      U.toast(m ? 'Member updated' : 'Member added', 'success');
-      closeModal();
-      render();
-    } else U.toast(r.error || 'Save failed', 'error');
-  };
-}
-
-function viewMember(id) {
-  const m = State.members.find(x => x.id === id);
-  if (!m) return;
-  const payments = State.payments.filter(p => p.memberId === id);
-  const attendance = State.attendance.filter(a => a.memberId === id);
-  const totalPaid = payments.reduce((s,p) => s + Number(p.amount||0), 0);
-  const daysLeft = U.daysLeft(m.endDate);
-  const status = U.status(m.endDate, State.settings.expiryWarningDays);
-  const cur = State.settings.currency;
-
-  openModal(`
-    <div class="modal-head">
-      <div>
-        <div class="modal-title">${U.esc(m.name)}</div>
-        <div class="text-sm text-dim">${U.esc(m.phone)} ${m.email ? '· ' + U.esc(m.email) : ''}</div>
-      </div>
-      <button class="modal-close" data-close>✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="stats" style="grid-template-columns: repeat(3,1fr); margin-bottom:1.5rem;">
-        <div class="stat"><div class="stat-label">Status</div><div style="margin-top:.5rem"><span class="badge ${status==='active'?'badge-success':status==='expiring'?'badge-warning':'badge-danger'}">${status}</span></div></div>
-        <div class="stat"><div class="stat-label">Days Left</div><div class="stat-value" style="font-size:1.4rem">${daysLeft < 0 ? '—' : daysLeft}</div></div>
-        <div class="stat"><div class="stat-label">Pending</div><div class="stat-value" style="font-size:1.4rem;color:#fbbf24">${U.fmtMoney(m.pending, cur)}</div></div>
-      </div>
-
-      <div class="grid-2" style="margin-bottom:1.5rem;">
-        <div><div class="text-xs text-muted">PACKAGE</div><div class="font-600">${U.esc(m.package||'—')}</div></div>
-        <div><div class="text-xs text-muted">START</div><div class="font-600">${U.fmtDate(m.startDate)}</div></div>
-        <div><div class="text-xs text-muted">END</div><div class="font-600">${U.fmtDate(m.endDate)}</div></div>
-        <div><div class="text-xs text-muted">GENDER</div><div class="font-600">${U.esc(m.gender||'—')}</div></div>
-        <div><div class="text-xs text-muted">DOB</div><div class="font-600">${U.fmtDate(m.dob)}</div></div>
-        <div><div class="text-xs text-muted">JOINED</div><div class="font-600">${U.fmtDate(m.joiningDate)}</div></div>
-        <div><div class="text-xs text-muted">TOTAL PAID</div><div class="font-600">${U.fmtMoney(totalPaid, cur)}</div></div>
-        <div><div class="text-xs text-muted">EMERGENCY</div><div class="font-600">${U.esc(m.emergencyContact||'—')}</div></div>
-      </div>
-
-      <div class="card-title mb-1">Payment History</div>
-      ${payments.length ? `
-        <table style="min-width:0"><thead><tr><th>Date</th><th>Amount</th><th>Method</th></tr></thead>
-        <tbody>${payments.map(p => `<tr><td>${U.fmtDate(p.date)}</td><td>${U.fmtMoney(p.amount, cur)}</td><td>${U.esc(p.method||'—')}</td></tr>`).join('')}</tbody></table>
-      ` : `<div class="text-muted text-sm" style="padding:.5rem 0">No payments recorded</div>`}
-
-      <div class="card-title mb-1 mt-3">Recent Attendance</div>
-      ${attendance.length ? `
-        <table style="min-width:0"><thead><tr><th>Date</th><th>In</th><th>Out</th></tr></thead>
-        <tbody>${attendance.slice(-5).reverse().map(a => `<tr><td>${U.fmtDate(a.date)}</td><td>${U.esc(a.checkIn||'—')}</td><td>${U.esc(a.checkOut||'—')}</td></tr>`).join('')}</tbody></table>
-      ` : `<div class="text-muted text-sm" style="padding:.5rem 0">No attendance records</div>`}
-    </div>
-    <div class="modal-foot">
-      <button class="btn" data-close>Close</button>
-      <button class="btn btn-primary" id="vm_edit">Edit</button>
-    </div>
-  `);
-
-  document.getElementById('vm_edit').onclick = () => { closeModal(); openMemberModal(id); };
-}
-
-async function deleteMember(id) {
-  const ok = await U.confirm('Delete this member? Their attendance and payment history will also be removed.');
-  if (!ok) return;
-  U.loading(true);
-  const r = await API.deleteMember(id);
-  U.loading(false);
-  if (r.success) { U.toast('Member deleted', 'success'); render(); }
-  else U.toast(r.error || 'Delete failed', 'error');
-}
-
-/* ---------- PACKAGE ---------- */
-function openPackageModal(id) {
-  const p = id ? State.packages.find(x => x.id === id) : null;
-  openModal(`
-    <div class="modal-head">
-      <div class="modal-title">${p ? 'Edit Package' : 'Add Package'}</div>
-      <button class="modal-close" data-close>✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-grid">
-        <div class="field full"><label>Name *</label><input id="pk_name" value="${U.esc(p?.name||'')}" placeholder="e.g. Monthly"></div>
-        <div class="field"><label>Duration (days) *</label><input type="number" id="pk_duration" value="${p?.duration||30}" min="1"></div>
-        <div class="field"><label>Price *</label><input type="number" id="pk_price" value="${p?.price||0}" min="0"></div>
-        <div class="field full"><label>Description</label><input id="pk_description" value="${U.esc(p?.description||'')}"></div>
-        <div class="field"><label>Status</label>
-          <select id="pk_status">
-            <option value="active" ${p?.status==='active'?'selected':''}>Active</option>
-            <option value="inactive" ${p?.status==='inactive'?'selected':''}>Inactive</option>
-          </select>
-        </div>
-      </div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn" data-close>Cancel</button>
-      <button class="btn btn-primary" id="pk_save">${p ? 'Update' : 'Create'}</button>
-    </div>
-  `);
-  document.getElementById('pk_save').onclick = async () => {
-    const name = document.getElementById('pk_name').value.trim();
-    if (!name) return U.toast('Package name is required', 'error');
-    const data = {
-      name,
-      duration: Number(document.getElementById('pk_duration').value) || 0,
-      price: Number(document.getElementById('pk_price').value) || 0,
-      description: document.getElementById('pk_description').value.trim(),
-      status: document.getElementById('pk_status').value
-    };
-    U.loading(true);
-    let r;
-    if (p) r = await API.updatePackage(p.id, data);
-    else { data.id = U.uid('pkg'); data.createdAt = new Date().toISOString(); r = await API.addPackage(data); }
-    U.loading(false);
-    if (r.success) { U.toast(p ? 'Package updated' : 'Package added', 'success'); closeModal(); render(); }
-    else U.toast(r.error || 'Save failed', 'error');
-  };
-}
-
-async function deletePackage(id) {
-  const ok = await U.confirm('Delete this package?');
-  if (!ok) return;
-  U.loading(true);
-  const r = await API.deletePackage(id);
-  U.loading(false);
-  if (r.success) { U.toast('Package deleted', 'success'); render(); }
-  else U.toast(r.error || 'Delete failed', 'error');
-}
-
-/* ---------- ATTENDANCE ---------- */
-function openAttendanceModal() {
-  const activeMembers = State.members.filter(m => U.status(m.endDate, State.settings.expiryWarningDays) !== 'expired');
-  if (!activeMembers.length) { U.toast('No active members to check in', 'warning'); return; }
-
-  openModal(`
-    <div class="modal-head">
-      <div class="modal-title">Mark Attendance</div>
-      <button class="modal-close" data-close>✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="field">
-        <label>Member *</label>
-        <select id="att_member">
-          ${activeMembers.map(m => `<option value="${m.id}">${U.esc(m.name)} · ${U.esc(m.phone)}</option>`).join('')}
-        </select>
-      </div>
-      <div class="form-grid">
-        <div class="field"><label>Date</label><input type="date" id="att_date" value="${U.today()}"></div>
-        <div class="field"><label>Check In</label><input type="time" id="att_in" value="${new Date().toTimeString().slice(0,5)}"></div>
-        <div class="field full"><label>Check Out (optional)</label><input type="time" id="att_out"></div>
-      </div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn" data-close>Cancel</button>
-      <button class="btn btn-primary" id="att_save">Mark Present</button>
-    </div>
-  `);
-
-  document.getElementById('att_save').onclick = async () => {
-    const data = {
-      id: U.uid('a'),
-      memberId: document.getElementById('att_member').value,
-      date: document.getElementById('att_date').value,
-      checkIn: document.getElementById('att_in').value,
-      checkOut: document.getElementById('att_out').value,
-      createdAt: new Date().toISOString()
-    };
-    if (!data.memberId || !data.date) return U.toast('Member and date required', 'error');
-    U.loading(true);
-    const r = await API.addAttendance(data);
-    U.loading(false);
-    if (r.success) { U.toast('Attendance marked', 'success'); closeModal(); render(); }
-    else U.toast(r.error || 'Failed', 'error');
-  };
-}
-
-async function deleteAttendance(id) {
-  const ok = await U.confirm('Delete this attendance record?');
-  if (!ok) return;
-  U.loading(true);
-  const r = await API.deleteAttendance(id);
-  U.loading(false);
-  if (r.success) { U.toast('Attendance deleted', 'success'); render(); }
-  else U.toast(r.error || 'Failed', 'error');
-}
-
-/* ---------- PAYMENT ---------- */
-function openPaymentModal(id) {
-  const p = id ? State.payments.find(x => x.id === id) : null;
-  openModal(`
-    <div class="modal-head">
-      <div class="modal-title">${p ? 'Edit Payment' : 'Record Payment'}</div>
-      <button class="modal-close" data-close>✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-grid">
-        <div class="field full"><label>Member *</label>
-          <select id="p_member">
-            ${State.members.map(m => `<option value="${m.id}" ${p?.memberId===m.id?'selected':''}>${U.esc(m.name)} · ${U.esc(m.phone)}</option>`).join('')}
-          </select>
-        </div>
-        <div class="field"><label>Date</label><input type="date" id="p_date" value="${U.esc(p?.date||U.today())}"></div>
-        <div class="field"><label>Amount *</label><input type="number" id="p_amount" value="${p?.amount||0}" min="0"></div>
-        <div class="field"><label>Method</label>
-          <select id="p_method">
-            ${['Cash','UPI','Card','Bank Transfer'].map(m => `<option ${p?.method===m?'selected':''}>${m}</option>`).join('')}
-          </select>
-        </div>
-        <div class="field"><label>Package</label>
-          <select id="p_package">
-            <option value="">—</option>
-            ${State.packages.map(pk => `<option ${p?.package===pk.name?'selected':''}>${U.esc(pk.name)}</option>`).join('')}
-          </select>
-        </div>
-        <div class="field full"><label>Transaction / Receipt No.</label><input id="p_txn" value="${U.esc(p?.transactionId||'')}"></div>
-        <div class="field full"><label>Notes</label><textarea id="p_notes">${U.esc(p?.notes||'')}</textarea></div>
-      </div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn" data-close>Cancel</button>
-      <button class="btn btn-primary" id="p_save">${p ? 'Update' : 'Save'} Payment</button>
-    </div>
-  `);
-  document.getElementById('p_save').onclick = async () => {
-    const data = {
-      memberId: document.getElementById('p_member').value,
-      date: document.getElementById('p_date').value,
-      amount: Number(document.getElementById('p_amount').value) || 0,
-      method: document.getElementById('p_method').value,
-      package: document.getElementById('p_package').value,
-      transactionId: document.getElementById('p_txn').value.trim(),
-      notes: document.getElementById('p_notes').value.trim()
-    };
-    if (!data.memberId) return U.toast('Select a member', 'error');
-    if (data.amount <= 0) return U.toast('Amount must be greater than zero', 'error');
-
-    U.loading(true);
-    let r;
-    if (p) r = await API.updatePayment(p.id, data);
-    else {
-      data.id = U.uid('pay');
-      data.createdAt = new Date().toISOString();
-      r = await API.addPayment(data);
-      if (r.success) {
-        const m = State.members.find(x => x.id === data.memberId);
-        if (m) {
-          const newPaid = Number(m.paid||0) + data.amount;
-          const newPending = Math.max(0, Number(m.amount||0) - newPaid);
-          await API.updateMember(m.id, { paid: newPaid, pending: newPending });
-        }
-      }
-    }
-    U.loading(false);
-    if (r.success) { U.toast(p ? 'Payment updated' : 'Payment recorded', 'success'); closeModal(); render(); }
-    else U.toast(r.error || 'Save failed', 'error');
-  };
-}
-
-async function deletePayment(id) {
-  const ok = await U.confirm('Delete this payment record?');
-  if (!ok) return;
-  const p = State.payments.find(x => x.id === id);
-  U.loading(true);
-  const r = await API.deletePayment(id);
-  if (r.success && p) {
-    const m = State.members.find(x => x.id === p.memberId);
-    if (m) {
-      const newPaid = Math.max(0, Number(m.paid||0) - Number(p.amount||0));
-      const newPending = Math.max(0, Number(m.amount||0) - newPaid);
-      await API.updateMember(m.id, { paid: newPaid, pending: newPending });
-    }
-  }
-  U.loading(false);
-  if (r.success) { U.toast('Payment deleted', 'success'); render(); }
-  else U.toast(r.error || 'Delete failed', 'error');
-}
-
-/* ---------- RENEW ---------- */
-function openRenewModal(id) {
-  const m = State.members.find(x => x.id === id);
-  if (!m) return;
-  const cur = State.settings.currency;
-  openModal(`
-    <div class="modal-head">
-      <div>
-        <div class="modal-title">Renew Membership</div>
-        <div class="text-sm text-dim">${U.esc(m.name)} · ${U.esc(m.phone)}</div>
-      </div>
-      <button class="modal-close" data-close>✕</button>
-    </div>
-    <div class="modal-body">
-      <div class="field"><label>New Package</label>
-        <select id="r_pkg">
-          ${State.packages.filter(p => p.status !== 'inactive').map(p => `<option value="${U.esc(p.name)}">${U.esc(p.name)} · ${p.duration}d · ${U.fmtMoney(p.price, cur)}</option>`).join('')}
-        </select>
-      </div>
-      <div class="form-grid">
-        <div class="field"><label>Start Date</label><input type="date" id="r_start" value="${U.today()}"></div>
-        <div class="field"><label>New End Date</label><input type="date" id="r_end"></div>
-        <div class="field"><label>Amount Paid Now</label><input type="number" id="r_paid" value="0" min="0"></div>
-      </div>
-    </div>
-    <div class="modal-foot">
-      <button class="btn" data-close>Cancel</button>
-      <button class="btn btn-primary" id="r_save">Renew</button>
-    </div>
-  `);
-  const pkgSel = document.getElementById('r_pkg');
-  const startInp = document.getElementById('r_start');
-  const endInp = document.getElementById('r_end');
-  function recalc() {
-    const p = State.packages.find(x => x.name === pkgSel.value);
-    if (!p) return;
-    const e = new Date(startInp.value);
-    e.setDate(e.getDate() + Number(p.duration));
-    endInp.value = e.toISOString().slice(0,10);
-  }
-  pkgSel.onchange = recalc;
-  startInp.onchange = recalc;
+  pkgSel.addEventListener('change', recalc);
+  startInp.addEventListener('change', recalc);
+  amtInp.addEventListener('input', updatePending);
+  payInp.addEventListener('input', updatePending);
   recalc();
 
-  document.getElementById('r_save').onclick = async () => {
-    const pkgName = pkgSel.value;
-    const p = State.packages.find(x => x.name === pkgName);
-    if (!p) return U.toast('Select a package', 'error');
-    const paid = Number(document.getElementById('r_paid').value) || 0;
+  $('#renewSubmitBtn').addEventListener('click', async () => {
+    const btn = $('#renewSubmitBtn');
+    const newPkgId = pkgSel.value;
+    const newStart = startInp.value;
+    const newEnd = endInp.value;
+    const newAmount = parseFloat(amtInp.value) || 0;
+    const newPay = parseFloat(payInp.value) || 0;
+    const method = $('#renewForm [name=payment_method]').value;
 
-    U.loading(true);
-    await API.updateMember(m.id, {
-      package: p.name,
-      startDate: startInp.value,
-      endDate: endInp.value,
-      amount: p.price,
-      pending: Math.max(0, p.price - paid)
-    });
-    if (paid > 0) {
-      await API.addPayment({
-        id: U.uid('pay'),
-        memberId: m.id,
-        date: U.today(),
-        amount: paid,
-        method: 'Cash',
-        package: p.name,
-        transactionId: 'RENEW-' + Date.now(),
-        notes: 'Renewal payment',
-        createdAt: new Date().toISOString()
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Processing...';
+    try {
+      await api.updateMember(member.id, {
+        package_id: newPkgId,
+        start_date: newStart,
+        end_date: newEnd,
+        amount: newAmount,
+        paid: newPay, // Renewal resets paid for new period
       });
+      if (newPay > 0) {
+        await sb.from('payments').insert({
+          gym_id: state.gym.id,
+          member_id: member.id,
+          date: todayISO(),
+          amount: newPay,
+          method,
+          package: pkgSel.selectedOptions[0].textContent.split(' — ')[0],
+          notes: 'Renewal',
+        });
+      }
+      toast('Membership renewed');
+      closeModal();
+      if (state.currentPage === 'members') loadMembersTable();
+      if (state.currentPage === 'expiry') renderExpiry();
+      if (state.currentPage === 'dashboard') renderDashboard();
+    } catch (err) {
+      console.error(err);
+      toast(friendlyError(err), 'error');
+      btn.disabled = false;
+      btn.textContent = 'Renew Membership';
     }
-    U.loading(false);
-    U.toast('Membership renewed', 'success');
-    closeModal();
-    render();
-  };
+  });
 }
 
 /* ============================================================
- *  INIT (no login — app loads immediately)
- * ============================================================ */
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('mobileMenuBtn').onclick = () => {
-    document.getElementById('sidebar').classList.toggle('open');
-    document.getElementById('sidebarBackdrop').classList.toggle('show');
-  };
-  document.getElementById('sidebarBackdrop').onclick = closeSidebar;
+   RECEIPT
+   ============================================================ */
+async function openReceipt(paymentId) {
+  const { data: payment } = await sb.from('payments')
+    .select('*, members(name,member_id,phone,amount,paid)')
+    .eq('id', paymentId).single();
+  if (!payment) return toast('Payment not found', 'error');
+  const s = state.settings;
+  const pending = Math.max(0, (payment.members?.amount||0) - (payment.members?.paid||0));
 
-  if (!API_URL || API_URL.includes('PASTE_YOUR')) {
-    console.warn('[Gym CRM] API_URL not set — running in DEMO mode (localStorage).');
-    U.toast('Demo mode: data is stored locally', 'warning');
+  openModal({
+    title: 'Receipt',
+    body: `
+      <div class="receipt" id="receiptPrint">
+        <h2>${escapeHtml(s.gym_name||'Gym')}</h2>
+        <div class="center">${escapeHtml(s.address||'')}<br>${escapeHtml(s.phone||'')}</div>
+        <hr>
+        <div class="receipt-row"><span>Receipt #</span><span>${escapeHtml(payment.id.slice(0,8).toUpperCase())}</span></div>
+        <div class="receipt-row"><span>Date</span><span>${formatDate(payment.date)}</span></div>
+        <div class="receipt-row"><span>Member</span><span>${escapeHtml(payment.members?.name||'—')}</span></div>
+        <div class="receipt-row"><span>Member ID</span><span>${escapeHtml(payment.members?.member_id||'—')}</span></div>
+        <div class="receipt-row"><span>Package</span><span>${escapeHtml(payment.package||'—')}</span></div>
+        <div class="receipt-row"><span>Method</span><span>${escapeHtml(payment.method||'—')}</span></div>
+        <hr>
+        <div class="receipt-row total"><span>Amount Paid</span><span>${money(payment.amount)}</span></div>
+        <div class="receipt-row"><span>Pending Balance</span><span>${money(pending)}</span></div>
+        <div class="thanks">Thank you! 💪<br>Keep training hard.</div>
+      </div>
+    `,
+    footer: `
+      <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+      <button class="btn btn-primary" onclick="window.print()">Print Receipt</button>
+    `
+  });
+}
+
+/* ============================================================
+   STARTUP
+   ============================================================ */
+sb.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_OUT') {
+    state.user = null;
+    showLogin();
   }
-
-  render();
 });
+
+checkAuth();
 </script>
 </body>
 </html>
