@@ -6,106 +6,61 @@
 <title>VelvetNet Gym CRM</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-/* ============================================
-   RESET & BASE
-   ============================================ */
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
-  --sidebar-bg:#111827;
-  --sidebar-hover:#1f2937;
-  --accent:#10b981;
-  --accent-dark:#059669;
-  --accent-light:#d1fae5;
-  --text:#111827;
-  --text-muted:#6b7280;
-  --border:#e5e7eb;
-  --bg:#f9fafb;
-  --white:#ffffff;
-  --danger:#ef4444;
-  --warning:#f59e0b;
-  --info:#3b82f6;
-  --radius:10px;
-  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+  --sidebar-bg:#111827;--sidebar-hover:#1f2937;--accent:#10b981;--accent-dark:#059669;
+  --accent-light:#d1fae5;--text:#111827;--text-muted:#6b7280;--border:#e5e7eb;
+  --bg:#f9fafb;--white:#ffffff;--danger:#ef4444;--warning:#f59e0b;--info:#3b82f6;
+  --radius:10px;--shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
   --shadow-lg:0 10px 25px rgba(0,0,0,.08);
 }
 html,body{height:100%}
-body{
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
   background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;
-  -webkit-font-smoothing:antialiased;
-}
+  -webkit-font-smoothing:antialiased}
 button{font-family:inherit;cursor:pointer;border:none;background:none}
 input,select,textarea{font-family:inherit;font-size:14px}
 a{color:var(--accent);text-decoration:none}
 a:hover{text-decoration:underline}
 
-/* ============================================
-   LAYOUT
-   ============================================ */
 .app{display:flex;min-height:100vh}
-.sidebar{
-  width:240px;background:var(--sidebar-bg);color:#fff;display:flex;
+.sidebar{width:240px;background:var(--sidebar-bg);color:#fff;display:flex;
   flex-direction:column;position:fixed;height:100vh;z-index:100;
-  transition:transform .25s ease;
-}
-.main{
-  flex:1;margin-left:240px;display:flex;flex-direction:column;min-height:100vh;
-}
-.topbar{
-  background:var(--white);border-bottom:1px solid var(--border);
+  transition:transform .25s ease}
+.main{flex:1;margin-left:240px;display:flex;flex-direction:column;min-height:100vh}
+.topbar{background:var(--white);border-bottom:1px solid var(--border);
   padding:14px 24px;display:flex;align-items:center;justify-content:space-between;
-  position:sticky;top:0;z-index:50;
-}
+  position:sticky;top:0;z-index:50}
 .topbar h2{font-size:18px;font-weight:600}
 .content{padding:24px;flex:1}
 
-/* ============================================
-   SIDEBAR
-   ============================================ */
-.sidebar-brand{
-  padding:20px;border-bottom:1px solid rgba(255,255,255,.08);
-  display:flex;align-items:center;gap:10px;
-}
-.sidebar-brand .logo{
-  width:34px;height:34px;background:var(--accent);border-radius:8px;
-  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;
-}
+.sidebar-brand{padding:20px;border-bottom:1px solid rgba(255,255,255,.08);
+  display:flex;align-items:center;gap:10px}
+.sidebar-brand .logo{width:34px;height:34px;background:var(--accent);border-radius:8px;
+  display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px}
 .sidebar-brand span{font-weight:600;font-size:15px}
 .nav{flex:1;padding:12px 8px;overflow-y:auto}
-.nav-item{
-  display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:8px;
   color:#9ca3af;font-size:14px;font-weight:500;width:100%;text-align:left;
-  transition:background .15s,color .15s;margin-bottom:2px;
-}
+  transition:background .15s,color .15s;margin-bottom:2px}
 .nav-item:hover{background:var(--sidebar-hover);color:#fff}
 .nav-item.active{background:var(--accent);color:#fff}
 .nav-item svg{width:18px;height:18px;flex-shrink:0}
 .sidebar-footer{padding:12px 8px;border-top:1px solid rgba(255,255,255,.08)}
-.sidebar-footer .user{
-  padding:10px 14px;color:#9ca3af;font-size:12px;
-  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-}
+.sidebar-footer .user{padding:10px 14px;color:#9ca3af;font-size:12px;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-/* ============================================
-   CARDS & COMPONENTS
-   ============================================ */
-.card{
-  background:var(--white);border-radius:var(--radius);border:1px solid var(--border);
-  box-shadow:var(--shadow);
-}
+.card{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);
+  box-shadow:var(--shadow)}
 .card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;
   align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .card-header h3{font-size:15px;font-weight:600}
 .card-body{padding:20px}
 
-.stats-grid{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-  gap:16px;margin-bottom:24px;
-}
-.stat-card{
-  background:var(--white);border-radius:var(--radius);border:1px solid var(--border);
-  padding:18px;box-shadow:var(--shadow);
-}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:16px;margin-bottom:24px}
+.stat-card{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);
+  padding:18px;box-shadow:var(--shadow)}
 .stat-card .label{font-size:12px;color:var(--text-muted);font-weight:500;
   text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
 .stat-card .value{font-size:26px;font-weight:700;color:var(--text)}
@@ -115,14 +70,9 @@ a:hover{text-decoration:underline}
 .stat-card .value.blue{color:var(--info)}
 .stat-card .sub{font-size:12px;color:var(--text-muted);margin-top:4px}
 
-/* ============================================
-   BUTTONS
-   ============================================ */
-.btn{
-  display:inline-flex;align-items:center;gap:6px;padding:9px 16px;
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;
   border-radius:8px;font-size:13px;font-weight:600;transition:all .15s;
-  white-space:nowrap;
-}
+  white-space:nowrap}
 .btn:disabled{opacity:.6;cursor:not-allowed}
 .btn-primary{background:var(--accent);color:#fff}
 .btn-primary:hover:not(:disabled){background:var(--accent-dark)}
@@ -134,51 +84,36 @@ a:hover{text-decoration:underline}
 .btn-sm{padding:6px 12px;font-size:12px}
 .btn-icon{padding:7px;border-radius:6px}
 
-/* ============================================
-   FORMS
-   ============================================ */
 .form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
 .form-group{display:flex;flex-direction:column;gap:6px}
 .form-group.full{grid-column:1/-1}
 .form-group label{font-size:13px;font-weight:600;color:var(--text)}
 .form-group input,.form-group select,.form-group textarea{
   padding:10px 12px;border:1px solid var(--border);border-radius:8px;
-  background:var(--white);transition:border .15s,box-shadow .15s;
-}
+  background:var(--white);transition:border .15s,box-shadow .15s}
 .form-group input:focus,.form-group select:focus,.form-group textarea:focus{
-  outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(16,185,129,.1);
-}
+  outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(16,185,129,.1)}
 .form-group textarea{resize:vertical;min-height:70px}
 .form-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;
   padding-top:20px;border-top:1px solid var(--border)}
 
-/* ============================================
-   TABLES
-   ============================================ */
 .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 table{width:100%;border-collapse:collapse;font-size:13px}
-th{
-  text-align:left;padding:11px 14px;font-weight:600;color:var(--text-muted);
+th{text-align:left;padding:11px 14px;font-weight:600;color:var(--text-muted);
   font-size:11px;text-transform:uppercase;letter-spacing:.5px;
-  border-bottom:1px solid var(--border);background:var(--bg);white-space:nowrap;
-}
+  border-bottom:1px solid var(--border);background:var(--bg);white-space:nowrap}
 td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
 tbody tr:hover{background:#fafafa}
 tbody tr:last-child td{border-bottom:none}
 
-.badge{
-  display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;
-  font-weight:600;white-space:nowrap;
-}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;
+  font-weight:600;white-space:nowrap}
 .badge-active{background:var(--accent-light);color:#065f46}
 .badge-expired{background:#fee2e2;color:#991b1b}
 .badge-soon{background:#fef3c7;color:#92400e}
 .badge-info{background:#dbeafe;color:#1e40af}
 .badge-gray{background:#f3f4f6;color:#4b5563}
 
-/* ============================================
-   TOOLBAR
-   ============================================ */
 .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
 .search-box{position:relative;flex:1;min-width:200px;max-width:380px}
 .search-box input{width:100%;padding:10px 12px 10px 36px;border:1px solid var(--border);
@@ -192,19 +127,12 @@ tbody tr:last-child td{border-bottom:none}
   color:var(--text-muted)}
 .filter-tabs button.active{background:var(--accent);color:#fff}
 
-/* ============================================
-   MODAL
-   ============================================ */
-.modal-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;
   display:none;align-items:flex-start;justify-content:center;padding:40px 16px;
-  overflow-y:auto;
-}
+  overflow-y:auto}
 .modal-overlay.show{display:flex}
-.modal{
-  background:var(--white);border-radius:var(--radius);width:100%;max-width:640px;
-  box-shadow:var(--shadow-lg);margin:auto 0;
-}
+.modal{background:var(--white);border-radius:var(--radius);width:100%;max-width:640px;
+  box-shadow:var(--shadow-lg);margin:auto 0}
 .modal.wide{max-width:800px}
 .modal-header{padding:18px 22px;border-bottom:1px solid var(--border);
   display:flex;align-items:center;justify-content:space-between}
@@ -214,57 +142,37 @@ tbody tr:last-child td{border-bottom:none}
 .modal-close:hover{background:var(--bg)}
 .modal-body{padding:22px;max-height:70vh;overflow-y:auto}
 .modal-footer{padding:16px 22px;border-top:1px solid var(--border);
-  display:flex;gap:10px;justify-content:flex-end}
+  display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap}
 
-/* ============================================
-   TOAST
-   ============================================ */
 .toast-container{position:fixed;top:20px;right:20px;z-index:2000;
   display:flex;flex-direction:column;gap:10px}
-.toast{
-  padding:13px 18px;border-radius:8px;color:#fff;font-size:13px;font-weight:500;
+.toast{padding:13px 18px;border-radius:8px;color:#fff;font-size:13px;font-weight:500;
   box-shadow:var(--shadow-lg);animation:slideIn .25s ease;min-width:260px;
-  display:flex;align-items:center;gap:10px;
-}
+  display:flex;align-items:center;gap:10px}
 .toast.success{background:var(--accent)}
 .toast.error{background:var(--danger)}
 .toast.info{background:var(--info)}
 @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
 
-/* ============================================
-   LOGIN
-   ============================================ */
-.login-screen{
-  min-height:100vh;display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(135deg,#111827 0%,#1f2937 100%);padding:20px;
-}
-.login-card{
-  background:var(--white);border-radius:14px;padding:40px 36px;width:100%;
-  max-width:400px;box-shadow:var(--shadow-lg);
-}
+.login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#111827 0%,#1f2937 100%);padding:20px}
+.login-card{background:var(--white);border-radius:14px;padding:40px 36px;width:100%;
+  max-width:400px;box-shadow:var(--shadow-lg)}
 .login-card .brand{text-align:center;margin-bottom:28px}
-.login-card .brand .logo{
-  width:56px;height:56px;background:var(--accent);border-radius:14px;
+.login-card .brand .logo{width:56px;height:56px;background:var(--accent);border-radius:14px;
   display:inline-flex;align-items:center;justify-content:center;
-  color:#fff;font-size:26px;font-weight:700;margin-bottom:12px;
-}
+  color:#fff;font-size:26px;font-weight:700;margin-bottom:12px}
 .login-card .brand h1{font-size:22px;font-weight:700}
 .login-card .brand p{color:var(--text-muted);font-size:13px;margin-top:4px}
 
-/* ============================================
-   MISC
-   ============================================ */
 .empty-state{text-align:center;padding:50px 20px;color:var(--text-muted)}
 .empty-state svg{width:48px;height:48px;margin-bottom:12px;opacity:.4}
-.spinner{
-  width:16px;height:16px;border:2px solid rgba(255,255,255,.3);
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,.3);
   border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;
-}
+  display:inline-block}
 @keyframes spin{to{transform:rotate(360deg)}}
-.loading-overlay{
-  display:flex;align-items:center;justify-content:center;padding:50px;
-  color:var(--text-muted);gap:10px;
-}
+.loading-overlay{display:flex;align-items:center;justify-content:center;padding:50px;
+  color:var(--text-muted);gap:10px}
 .actions-cell{display:flex;gap:4px}
 .section-title{font-size:14px;font-weight:600;margin:20px 0 10px;
   padding-bottom:8px;border-bottom:1px solid var(--border)}
@@ -278,9 +186,6 @@ tbody tr:last-child td{border-bottom:none}
 .mobile-menu-btn svg{width:22px;height:22px}
 .sidebar-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99}
 
-/* ============================================
-   RECEIPT
-   ============================================ */
 .receipt{max-width:360px;margin:0 auto;font-family:'Courier New',monospace;
   padding:20px;background:#fff}
 .receipt h2{text-align:center;font-size:18px;margin-bottom:4px}
@@ -291,9 +196,24 @@ tbody tr:last-child td{border-bottom:none}
   padding-top:8px;margin-top:8px}
 .receipt .thanks{text-align:center;margin-top:18px;font-size:12px;color:#555}
 
-/* ============================================
-   RESPONSIVE
-   ============================================ */
+/* Photo / KYC upload block */
+.kyc-block{background:var(--bg);padding:16px;border-radius:8px;grid-column:1/-1}
+.photo-preview{width:110px;height:110px;border-radius:50%;background:#e5e7eb;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+  border:3px solid var(--white);box-shadow:0 2px 8px rgba(0,0,0,.1);
+  font-size:36px;color:#9ca3af}
+.photo-preview img{width:100%;height:100%;object-fit:cover}
+.profile-photo-lg{width:80px;height:80px;border-radius:50%;background:#e5e7eb;
+  overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-size:32px;color:#9ca3af;border:3px solid var(--white);
+  box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.profile-photo-lg img{width:100%;height:100%;object-fit:cover}
+.avatar-sm{width:36px;height:36px;border-radius:50%;object-fit:cover;
+  border:2px solid var(--border)}
+.avatar-placeholder{width:36px;height:36px;border-radius:50%;background:#f3f4f6;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;color:#9ca3af}
+
 @media(max-width:900px){
   .sidebar{transform:translateX(-100%)}
   .sidebar.open{transform:translateX(0)}
@@ -315,7 +235,6 @@ tbody tr:last-child td{border-bottom:none}
   .topbar{padding:12px 16px}
   .topbar h2{font-size:16px}
 }
-
 @media print{
   body *{visibility:hidden}
   .receipt,.receipt *{visibility:visible}
@@ -431,28 +350,20 @@ tbody tr:last-child td{border-bottom:none}
 
 <script>
 /* ============================================================
-   CONFIGURATION — REPLACE THESE WITH YOUR SUPABASE VALUES
+   CONFIGURATION — REPLACE THESE
    ============================================================ */
 const SUPABASE_URL = 'https://cgsnwlbjqplqgcdupzts.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNnc253bGJqcXBscWdjZHVwenRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAxNDI5MDQsImV4cCI6MjEwNTcxODkwNH0.TuNHuu4b4CGyL9-wFomVKpc4D6gKx8q-8_6yo7jUU1k';
 
-/* ============================================================
-   SUPABASE CLIENT  (js/supabase.js)
-   ============================================================ */
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 /* ============================================================
-   GLOBAL STATE / CACHE
+   STATE
    ============================================================ */
 const state = {
-  user: null,
-  gym: null,
-  settings: null,
-  packages: [],
+  user: null, gym: null, settings: null, packages: [],
   currentPage: 'dashboard',
-  membersCache: {},     // id -> member object
-  membersList: [],
-  pendingEditMember: null,
+  membersCache: {}, membersList: [], pendingEditMember: null,
 };
 
 const CURRENCY = () => state.settings?.currency || '₹';
@@ -487,9 +398,7 @@ function formatTime(t) {
   return `${h12}:${m} ${ampm}`;
 }
 
-function todayISO() {
-  return new Date().toISOString().split('T')[0];
-}
+function todayISO() { return new Date().toISOString().split('T')[0]; }
 
 function daysBetween(a, b) {
   const d1 = new Date(a + 'T00:00:00');
@@ -502,11 +411,9 @@ function money(n) {
   return CURRENCY() + num.toLocaleString('en-IN', { maximumFractionDigits: 2 });
 }
 
-/** Compute membership status for a member */
 function memberStatus(member) {
   if (!member || !member.end_date) return 'no-membership';
-  const today = todayISO();
-  const remaining = daysBetween(today, member.end_date);
+  const remaining = daysBetween(todayISO(), member.end_date);
   if (remaining < 0) return 'expired';
   if (remaining <= WARNING_DAYS()) return 'expiring-soon';
   return 'active';
@@ -527,9 +434,6 @@ function getPending(member) {
   return (Number(member.amount) || 0) - (Number(member.paid) || 0);
 }
 
-/* ============================================================
-   TOASTS
-   ============================================================ */
 function toast(message, type = 'success') {
   const el = document.createElement('div');
   el.className = `toast ${type}`;
@@ -565,16 +469,14 @@ $('#modalOverlay').addEventListener('click', e => {
 });
 
 /* ============================================================
-   AUTH  (js/auth.js)
+   AUTH
    ============================================================ */
 async function checkAuth() {
   const { data: { session } } = await sb.auth.getSession();
   if (session?.user) {
     state.user = session.user;
     await bootApp();
-  } else {
-    showLogin();
-  }
+  } else showLogin();
 }
 
 function showLogin() {
@@ -593,16 +495,16 @@ $('#loginForm').addEventListener('submit', async (e) => {
   const btn = $('#loginBtn');
   btn.disabled = true;
   btn.innerHTML = '<span class="spinner"></span> Signing in...';
-  const email = $('#loginEmail').value.trim();
-  const password = $('#loginPassword').value;
   try {
-    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    const { data, error } = await sb.auth.signInWithPassword({
+      email: $('#loginEmail').value.trim(),
+      password: $('#loginPassword').value,
+    });
     if (error) throw error;
     state.user = data.user;
     toast('Welcome back!');
     await bootApp();
   } catch (err) {
-    console.error(err);
     toast(friendlyError(err), 'error');
   } finally {
     btn.disabled = false;
@@ -612,17 +514,13 @@ $('#loginForm').addEventListener('submit', async (e) => {
 
 $('#logoutBtn').addEventListener('click', async () => {
   await sb.auth.signOut();
-  state.user = null;
-  state.gym = null;
-  state.settings = null;
-  state.packages = [];
-  state.membersCache = {};
+  Object.assign(state, { user:null, gym:null, settings:null, packages:[], membersCache:{} });
   showLogin();
   toast('Signed out');
 });
 
 /* ============================================================
-   DATA ACCESS LAYER  (js/supabase.js continued)
+   DATA ACCESS
    ============================================================ */
 function friendlyError(err) {
   const msg = (err?.message || '').toLowerCase();
@@ -632,28 +530,25 @@ function friendlyError(err) {
   if (msg.includes('duplicate') && msg.includes('attendance')) return 'Attendance already recorded today';
   if (msg.includes('permission') || msg.includes('policy')) return 'You do not have permission for this action';
   if (msg.includes('network') || msg.includes('fetch')) return 'Network error. Check your connection.';
+  if (msg.includes('bucket not found')) return 'Storage bucket missing. Run the storage setup SQL.';
+  if (msg.includes('row-level security')) return 'Storage RLS blocked. Check your storage policies.';
   return err?.message || 'Something went wrong';
 }
 
 const api = {
-  /* -------- GYM -------- */
   async ensureGym() {
     const { data: existing } = await sb.from('gyms').select('*').limit(1).maybeSingle();
     if (existing) return existing;
     const { data, error } = await sb.from('gyms')
-      .insert({ name: 'My Gym', owner_id: state.user.id })
-      .select().single();
+      .insert({ name: 'My Gym', owner_id: state.user.id }).select().single();
     if (error) throw error;
     return data;
   },
-
-  /* -------- SETTINGS -------- */
   async getSettings(gymId) {
     const { data } = await sb.from('gym_settings').select('*').eq('gym_id', gymId).maybeSingle();
     if (data) return data;
     const { data: created, error } = await sb.from('gym_settings')
-      .insert({ gym_id: gymId, gym_name: 'My Gym' })
-      .select().single();
+      .insert({ gym_id: gymId, gym_name: 'My Gym' }).select().single();
     if (error) throw error;
     return created;
   },
@@ -663,13 +558,10 @@ const api = {
     if (error) throw error;
     return data;
   },
-
-  /* -------- PACKAGES -------- */
   async getPackages(gymId) {
     const { data, error } = await sb.from('packages')
       .select('id,name,duration_months,price,description,status')
-      .eq('gym_id', gymId).eq('status', 'active')
-      .order('duration_months');
+      .eq('gym_id', gymId).eq('status','active').order('duration_months');
     if (error) throw error;
     return data || [];
   },
@@ -690,16 +582,13 @@ const api = {
     if (error) throw error;
   },
 
-  /* -------- MEMBERS -------- */
-  async getMembers(gymId, { search = '', filter = 'all', limit = 500 } = {}) {
+  async getMembers(gymId, { search='', filter='all', limit=500 } = {}) {
     let q = sb.from('members')
-      .select('id,member_id,name,phone,email,gender,package_id,start_date,end_date,amount,paid,joining_date')
+      .select('id,member_id,name,phone,email,gender,package_id,start_date,end_date,amount,paid,joining_date,photo_url,id_type,id_number,id_document_url,id_verified')
       .eq('gym_id', gymId)
       .order('created_at', { ascending: false })
       .limit(limit);
-    if (search) {
-      q = q.or(`name.ilike.%${search}%,phone.ilike.%${search}%,member_id.ilike.%${search}%`);
-    }
+    if (search) q = q.or(`name.ilike.%${search}%,phone.ilike.%${search}%,member_id.ilike.%${search}%`);
     const { data, error } = await q;
     if (error) throw error;
     let list = data || [];
@@ -741,8 +630,7 @@ const api = {
     return 'M' + String(next).padStart(4, '0');
   },
 
-  /* -------- ATTENDANCE -------- */
-  async getAttendance(gymId, { date = null, memberId = null, limit = 200 } = {}) {
+  async getAttendance(gymId, { date=null, memberId=null, limit=200 } = {}) {
     let q = sb.from('attendance')
       .select('id,member_id,date,check_in,check_out,members(name,member_id,phone)')
       .eq('gym_id', gymId)
@@ -762,8 +650,7 @@ const api = {
     return data;
   },
   async markAttendance(gymId, memberId) {
-    const now = new Date();
-    const time = now.toTimeString().split(' ')[0];
+    const time = new Date().toTimeString().split(' ')[0];
     const { data, error } = await sb.from('attendance')
       .insert({ gym_id: gymId, member_id: memberId, date: todayISO(), check_in: time })
       .select().single();
@@ -787,8 +674,7 @@ const api = {
     return count || 0;
   },
 
-  /* -------- PAYMENTS -------- */
-  async getPayments(gymId, { memberId = null, from = null, to = null, search = '', limit = 200 } = {}) {
+  async getPayments(gymId, { memberId=null, from=null, to=null, search='', limit=200 } = {}) {
     let q = sb.from('payments')
       .select('id,member_id,date,amount,method,package,transaction_id,notes,members(name,member_id,phone)')
       .eq('gym_id', gymId)
@@ -816,10 +702,8 @@ const api = {
     const { data, error } = await sb.from('payments')
       .insert({ ...p, gym_id: gymId }).select().single();
     if (error) throw error;
-    // Update member paid amount
     const member = await api.getMember(p.member_id);
-    const newPaid = (Number(member.paid) || 0) + Number(p.amount);
-    await api.updateMember(member.id, { paid: newPaid });
+    await api.updateMember(member.id, { paid: (Number(member.paid) || 0) + Number(p.amount) });
     return data;
   },
   async updatePayment(id, patch) {
@@ -827,7 +711,6 @@ const api = {
     const { data, error } = await sb.from('payments')
       .update(patch).eq('id', id).select().single();
     if (error) throw error;
-    // Adjust member paid
     if (before && patch.amount !== undefined && Number(patch.amount) !== Number(before.amount)) {
       const diff = Number(patch.amount) - Number(before.amount);
       const member = await api.getMember(before.member_id);
@@ -842,22 +725,19 @@ const api = {
     if (before) {
       const member = await api.getMember(before.member_id);
       await api.updateMember(member.id, {
-        paid: Math.max(0, (Number(member.paid) || 0) - Number(before.amount))
+        paid: Math.max(0, (Number(member.paid) || 0) - Number(before.amount)),
       });
     }
   },
 
-  /* -------- DASHBOARD -------- */
   async getDashboardStats(gymId) {
     const today = todayISO();
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
     const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString().split('T')[0];
 
-    // We need enough member data to compute status. Pull minimum columns.
     const { data: members } = await sb.from('members')
       .select('id,end_date,amount,paid').eq('gym_id', gymId).limit(5000);
-
     const list = members || [];
     let active = 0, expired = 0, expiring = 0, totalPending = 0;
     for (const m of list) {
@@ -867,26 +747,15 @@ const api = {
       else if (s === 'expiring-soon') expiring++;
       totalPending += Math.max(0, getPending(m));
     }
-
-    // Revenue (today & this month)
     const { data: todayPays } = await sb.from('payments')
       .select('amount').eq('gym_id', gymId).eq('date', today);
     const todayRevenue = (todayPays || []).reduce((s, p) => s + Number(p.amount), 0);
-
     const { data: monthPays } = await sb.from('payments')
       .select('amount').eq('gym_id', gymId).gte('date', monthStart).lte('date', monthEnd);
     const monthRevenue = (monthPays || []).reduce((s, p) => s + Number(p.amount), 0);
-
     const todayAttendance = await api.countTodayAttendance(gymId);
-
-    return {
-      totalMembers: list.length,
-      active, expired, expiring,
-      todayAttendance,
-      todayRevenue,
-      monthRevenue,
-      pendingPayments: totalPending,
-    };
+    return { totalMembers: list.length, active, expired, expiring,
+      todayAttendance, todayRevenue, monthRevenue, pendingPayments: totalPending };
   },
 
   async getExpiryBuckets(gymId) {
@@ -906,59 +775,204 @@ const api = {
     return buckets;
   },
 
-  /* -------- REPORTS -------- */
   async getReport(gymId, from, to) {
-    const { data: newMembers } = await sb.from('members')
-      .select('id,joining_date').eq('gym_id', gymId)
-      .gte('joining_date', from).lte('joining_date', to);
+    const [membersRes, paysRes, attRes] = await Promise.all([
+      sb.from('members').select('id,joining_date,end_date,amount,paid').eq('gym_id', gymId),
+      sb.from('payments').select('amount,date,method').eq('gym_id', gymId).gte('date', from).lte('date', to),
+      sb.from('attendance').select('id', { count: 'exact', head: true }).eq('gym_id', gymId).gte('date', from).lte('date', to),
+    ]);
+    if (membersRes.error) throw new Error('members: ' + membersRes.error.message);
+    if (paysRes.error) throw new Error('payments: ' + paysRes.error.message);
+    if (attRes.error) throw new Error('attendance: ' + attRes.error.message);
 
-    const { data: pays } = await sb.from('payments')
-      .select('amount,date,method').eq('gym_id', gymId)
-      .gte('date', from).lte('date', to);
-
-    const { count: attendance } = await sb.from('attendance')
-      .select('id', { count: 'exact', head: true })
-      .eq('gym_id', gymId).gte('date', from).lte('date', to);
-
-    const { data: allMembers } = await sb.from('members')
-      .select('id,end_date,amount,paid').eq('gym_id', gymId);
+    const allMembers = membersRes.data || [];
+    const pays = paysRes.data || [];
+    const newMembers = allMembers.filter(m =>
+      m.joining_date && m.joining_date >= from && m.joining_date <= to).length;
 
     let active = 0, expired = 0, pending = 0;
-    (allMembers || []).forEach(m => {
+    allMembers.forEach(m => {
       const s = memberStatus(m);
       if (s === 'active' || s === 'expiring-soon') active++;
       else if (s === 'expired') expired++;
       pending += Math.max(0, getPending(m));
     });
-
-    const revenue = (pays || []).reduce((s, p) => s + Number(p.amount), 0);
+    const revenue = pays.reduce((s, p) => s + Number(p.amount), 0);
     const byMethod = {};
-    (pays || []).forEach(p => {
-      byMethod[p.method] = (byMethod[p.method] || 0) + Number(p.amount);
-    });
+    pays.forEach(p => { byMethod[p.method] = (byMethod[p.method] || 0) + Number(p.amount); });
 
-    return {
-      newMembers: newMembers?.length || 0,
-      revenue,
-      byMethod,
-      attendance: attendance || 0,
-      totalMembers: allMembers?.length || 0,
-      activeMembers: active,
-      expiredMembers: expired,
-      pendingPayments: pending,
-    };
+    return { newMembers, revenue, byMethod, attendance: attRes.count || 0,
+      totalMembers: allMembers.length, activeMembers: active, expiredMembers: expired,
+      pendingPayments: pending };
   },
 };
 
 /* ============================================================
-   BOOT / INITIAL LOAD
+   STORAGE HELPERS (photo + document uploads)
+   ============================================================ */
+const storage = {
+  async upload(bucket, file, gymId, memberId) {
+    const ext = (file.name.split('.').pop() || 'bin').toLowerCase();
+    const path = `${gymId}/${memberId}/${Date.now()}.${ext}`;
+    const { data, error } = await sb.storage
+      .from(bucket).upload(path, file, { upsert: false, cacheControl: '3600' });
+    if (error) throw error;
+    const { data: signed, error: sErr } = await sb.storage
+      .from(bucket).createSignedUrl(path, 60 * 60 * 24 * 365);
+    if (sErr) throw sErr;
+    return { path: data.path, url: signed.signedUrl };
+  },
+  async remove(bucket, path) {
+    if (!path) return;
+    const { error } = await sb.storage.from(bucket).remove([path]);
+    if (error) console.warn('Storage remove failed:', error.message);
+  },
+  pathFromUrl(url) {
+    if (!url) return null;
+    try {
+      const u = new URL(url);
+      const match = u.pathname.match(/\/object\/(?:sign|public)\/[^/]+\/(.+)$/);
+      return match ? decodeURIComponent(match[1]) : null;
+    } catch { return null; }
+  },
+};
+
+/* ============================================================
+   BACKUP / EXPORT
+   ============================================================ */
+function csvEscape(v) {
+  if (v === null || v === undefined) return '';
+  const s = String(v);
+  if (/[",\n\r]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+  return s;
+}
+function toCSV(rows) {
+  if (!rows || rows.length === 0) return '';
+  const headers = Object.keys(rows[0]);
+  const lines = [headers.join(',')];
+  for (const row of rows) lines.push(headers.map(h => csvEscape(row[h])).join(','));
+  return lines.join('\n');
+}
+function downloadFile(filename, content, mime = 'text/plain') {
+  const blob = new Blob([content], { type: mime + ';charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+function fileStamp() {
+  const d = new Date();
+  const p = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}_${p(d.getHours())}${p(d.getMinutes())}`;
+}
+
+async function downloadAllCSV() {
+  const btn = $('#downloadAllBtn');
+  if (!btn) return;
+  const original = btn.textContent;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner" style="border-color:var(--border);border-top-color:var(--accent)"></span> Preparing...';
+  try {
+    const gymId = state.gym.id;
+    const [members, payments, attendance, packages, settings] = await Promise.all([
+      sb.from('members').select('*').eq('gym_id', gymId),
+      sb.from('payments').select('*').eq('gym_id', gymId),
+      sb.from('attendance').select('*').eq('gym_id', gymId),
+      sb.from('packages').select('*').eq('gym_id', gymId),
+      sb.from('gym_settings').select('*').eq('gym_id', gymId),
+    ]);
+    const pkgMap = {};
+    (packages.data || []).forEach(p => pkgMap[p.id] = p.name);
+    const enrichedMembers = (members.data || []).map(m => ({
+      ...m,
+      package_name: pkgMap[m.package_id] || '',
+      pending: (Number(m.amount) || 0) - (Number(m.paid) || 0),
+      status: memberStatus(m),
+    }));
+    const memMap = {};
+    (members.data || []).forEach(m => memMap[m.id] = m);
+    const enrichedPayments = (payments.data || []).map(p => ({
+      ...p,
+      member_name: memMap[p.member_id]?.name || '',
+      member_code: memMap[p.member_id]?.member_id || '',
+    }));
+    const enrichedAttendance = (attendance.data || []).map(a => ({
+      ...a,
+      member_name: memMap[a.member_id]?.name || '',
+      member_code: memMap[a.member_id]?.member_id || '',
+    }));
+    const stamp = fileStamp();
+    const gymSlug = (state.settings?.gym_name || 'gym').replace(/\W+/g, '_');
+    const files = [
+      { name: `${gymSlug}_members_${stamp}.csv`, data: enrichedMembers },
+      { name: `${gymSlug}_payments_${stamp}.csv`, data: enrichedPayments },
+      { name: `${gymSlug}_attendance_${stamp}.csv`, data: enrichedAttendance },
+      { name: `${gymSlug}_packages_${stamp}.csv`, data: packages.data || [] },
+      { name: `${gymSlug}_settings_${stamp}.csv`, data: settings.data || [] },
+    ];
+    for (const f of files) {
+      downloadFile(f.name, toCSV(f.data), 'text/csv');
+      await new Promise(r => setTimeout(r, 250));
+    }
+    localStorage.setItem('lastBackup', Date.now());
+    toast(`Downloaded 5 CSV files (${files.reduce((s,f)=>s+f.data.length,0)} rows)`);
+  } catch (err) {
+    toast(friendlyError(err), 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = original;
+  }
+}
+
+async function downloadFullBackup() {
+  const btn = $('#downloadJsonBtn');
+  if (!btn) return;
+  const original = btn.textContent;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner" style="border-color:var(--border);border-top-color:var(--accent)"></span> Preparing...';
+  try {
+    const gymId = state.gym.id;
+    const [gym, settings, packages, members, attendance, payments] = await Promise.all([
+      sb.from('gyms').select('*').eq('id', gymId).single(),
+      sb.from('gym_settings').select('*').eq('gym_id', gymId),
+      sb.from('packages').select('*').eq('gym_id', gymId),
+      sb.from('members').select('*').eq('gym_id', gymId),
+      sb.from('attendance').select('*').eq('gym_id', gymId),
+      sb.from('payments').select('*').eq('gym_id', gymId),
+    ]);
+    const backup = {
+      _meta: { exported_at: new Date().toISOString(), gym_id: gymId,
+        app: 'VelvetNet Gym CRM', version: 1 },
+      gym: gym.data,
+      gym_settings: settings.data || [],
+      packages: packages.data || [],
+      members: members.data || [],
+      attendance: attendance.data || [],
+      payments: payments.data || [],
+    };
+    const stamp = fileStamp();
+    const gymSlug = (state.settings?.gym_name || 'gym').replace(/\W+/g, '_');
+    downloadFile(`${gymSlug}_full_backup_${stamp}.json`,
+      JSON.stringify(backup, null, 2), 'application/json');
+    localStorage.setItem('lastBackup', Date.now());
+    toast(`Full backup downloaded (${(JSON.stringify(backup).length/1024).toFixed(1)} KB)`);
+  } catch (err) {
+    toast(friendlyError(err), 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = original;
+  }
+}
+
+/* ============================================================
+   BOOT
    ============================================================ */
 async function bootApp() {
   try {
     showApp();
     setPageTitle('Loading...');
     state.gym = await api.ensureGym();
-    // Load settings + packages in parallel
     const [settings, packages] = await Promise.all([
       api.getSettings(state.gym.id),
       api.getPackages(state.gym.id),
@@ -967,8 +981,13 @@ async function bootApp() {
     state.packages = packages;
     document.title = `${settings.gym_name} — VelvetNet CRM`;
     navigate('dashboard');
+
+    const lastBackup = localStorage.getItem('lastBackup');
+    const week = 7 * 24 * 60 * 60 * 1000;
+    if (!lastBackup || Date.now() - Number(lastBackup) > week) {
+      setTimeout(() => toast('Tip: Back up your data from Settings → Download All Data', 'info'), 3000);
+    }
   } catch (err) {
-    console.error(err);
     toast(friendlyError(err), 'error');
     setPageTitle('Error');
   }
@@ -981,31 +1000,17 @@ function setPageTitle(t) { $('#pageTitle').textContent = t; }
 
 function navigate(page) {
   state.currentPage = page;
-  $$('#navMenu .nav-item').forEach(b =>
-    b.classList.toggle('active', b.dataset.page === page)
-  );
+  $$('#navMenu .nav-item').forEach(b => b.classList.toggle('active', b.dataset.page === page));
   closeSidebarMobile();
   $('#topbarActions').innerHTML = '';
-  const content = $('#pageContent');
-  content.innerHTML = '<div class="loading-overlay"><span class="spinner" style="border-color:var(--border);border-top-color:var(--accent)"></span> Loading...</div>';
-
-  const titles = {
-    dashboard: 'Dashboard', members: 'Members', attendance: 'Attendance',
-    payments: 'Payments', memberships: 'Membership Packages', expiry: 'Expiry Management',
-    reports: 'Reports', settings: 'Settings',
-  };
+  $('#pageContent').innerHTML = '<div class="loading-overlay"><span class="spinner" style="border-color:var(--border);border-top-color:var(--accent)"></span> Loading...</div>';
+  const titles = { dashboard:'Dashboard', members:'Members', attendance:'Attendance',
+    payments:'Payments', memberships:'Membership Packages', expiry:'Expiry Management',
+    reports:'Reports', settings:'Settings' };
   setPageTitle(titles[page] || page);
-
-  const renderers = {
-    dashboard: renderDashboard,
-    members: renderMembers,
-    attendance: renderAttendance,
-    payments: renderPayments,
-    memberships: renderPackages,
-    expiry: renderExpiry,
-    reports: renderReports,
-    settings: renderSettings,
-  };
+  const renderers = { dashboard: renderDashboard, members: renderMembers,
+    attendance: renderAttendance, payments: renderPayments, memberships: renderPackages,
+    expiry: renderExpiry, reports: renderReports, settings: renderSettings };
   (renderers[page] || renderDashboard)();
 }
 
@@ -1028,15 +1033,14 @@ $('#mobileMenuBtn').addEventListener('click', openSidebarMobile);
 $('#sidebarBackdrop').addEventListener('click', closeSidebarMobile);
 
 /* ============================================================
-   PAGE: DASHBOARD
+   DASHBOARD
    ============================================================ */
 async function renderDashboard() {
   try {
     const stats = await api.getDashboardStats(state.gym.id);
     const buckets = await api.getExpiryBuckets(state.gym.id);
     const upcoming = [...buckets.d7, ...buckets.d15]
-      .sort((a, b) => (a.end_date > b.end_date ? 1 : -1))
-      .slice(0, 6);
+      .sort((a, b) => (a.end_date > b.end_date ? 1 : -1)).slice(0, 6);
 
     $('#pageContent').innerHTML = `
       <div class="stats-grid">
@@ -1048,7 +1052,6 @@ async function renderDashboard() {
         <div class="stat-card"><div class="label">Today's Revenue</div><div class="value green">${money(stats.todayRevenue)}</div><div class="sub">This month: ${money(stats.monthRevenue)}</div></div>
         <div class="stat-card"><div class="label">Pending Payments</div><div class="value red">${money(stats.pendingPayments)}</div><div class="sub">Outstanding</div></div>
       </div>
-
       <div class="card">
         <div class="card-header"><h3>Upcoming Expiries (next 15 days)</h3></div>
         <div class="card-body" style="padding:0">
@@ -1070,24 +1073,20 @@ async function renderDashboard() {
                   }).join('')}
                 </tbody></table></div>`}
         </div>
-      </div>
-    `;
+      </div>`;
   } catch (err) {
-    console.error(err);
     toast(friendlyError(err), 'error');
     $('#pageContent').innerHTML = `<div class="empty-state">Failed to load dashboard</div>`;
   }
 }
 
 /* ============================================================
-   PAGE: MEMBERS
+   MEMBERS
    ============================================================ */
 let membersUI = { search: '', filter: 'all' };
 
 async function renderMembers() {
-  $('#topbarActions').innerHTML = `
-    <button class="btn btn-primary" id="addMemberBtn">+ Add Member</button>
-  `;
+  $('#topbarActions').innerHTML = `<button class="btn btn-primary" id="addMemberBtn">+ Add Member</button>`;
   $('#addMemberBtn').addEventListener('click', openAddMemberModal);
 
   $('#pageContent').innerHTML = `
@@ -1103,21 +1102,19 @@ async function renderMembers() {
         <button data-f="expired" class="${membersUI.filter==='expired'?'active':''}">Expired</button>
       </div>
     </div>
-    <div class="card"><div id="membersTable"><div class="loading-overlay"><span class="spinner" style="border-color:var(--border);border-top-color:var(--accent)"></span> Loading members...</div></div></div>
-  `;
+    <div class="card"><div id="membersTable"><div class="loading-overlay"><span class="spinner" style="border-color:var(--border);border-top-color:var(--accent)"></span> Loading members...</div></div></div>`;
 
   let debounce;
   $('#memberSearch').addEventListener('input', e => {
     membersUI.search = e.target.value;
     clearTimeout(debounce);
-    debounce = setTimeout(() => loadMembersTable(), 300);
+    debounce = setTimeout(loadMembersTable, 300);
   });
   $$('#memberFilters button').forEach(b => b.addEventListener('click', () => {
     membersUI.filter = b.dataset.f;
     $$('#memberFilters button').forEach(x => x.classList.toggle('active', x === b));
     loadMembersTable();
   }));
-
   loadMembersTable();
 }
 
@@ -1127,9 +1124,7 @@ async function loadMembersTable() {
   wrap.innerHTML = '<div class="loading-overlay"><span class="spinner" style="border-color:var(--border);border-top-color:var(--accent)"></span> Loading...</div>';
   try {
     const members = await api.getMembers(state.gym.id, {
-      search: membersUI.search,
-      filter: membersUI.filter,
-    });
+      search: membersUI.search, filter: membersUI.filter });
     state.membersList = members;
     state.membersCache = {};
     members.forEach(m => state.membersCache[m.id] = m);
@@ -1138,14 +1133,13 @@ async function loadMembersTable() {
       wrap.innerHTML = '<div class="empty-state">No members found</div>';
       return;
     }
-
     const pkgMap = {};
     state.packages.forEach(p => pkgMap[p.id] = p.name);
 
     wrap.innerHTML = `
       <div class="table-wrap"><table>
         <thead><tr>
-          <th>ID</th><th>Name</th><th>Phone</th><th>Package</th>
+          <th></th><th>ID</th><th>Name</th><th>Phone</th><th>Package</th>
           <th>Start</th><th>End</th><th>Amount</th><th>Paid</th><th>Pending</th>
           <th>Status</th><th>Actions</th>
         </tr></thead>
@@ -1153,7 +1147,11 @@ async function loadMembersTable() {
           ${members.map(m => {
             const status = memberStatus(m);
             const pending = Math.max(0, getPending(m));
+            const avatar = m.photo_url
+              ? `<img src="${escapeHtml(m.photo_url)}" class="avatar-sm" alt="">`
+              : `<div class="avatar-placeholder">👤</div>`;
             return `<tr>
+              <td>${avatar}</td>
               <td>${escapeHtml(m.member_id || '—')}</td>
               <td><strong>${escapeHtml(m.name)}</strong></td>
               <td>${escapeHtml(m.phone || '—')}</td>
@@ -1171,16 +1169,13 @@ async function loadMembersTable() {
             </tr>`;
           }).join('')}
         </tbody>
-      </table></div>
-    `;
+      </table></div>`;
   } catch (err) {
-    console.error(err);
     wrap.innerHTML = `<div class="empty-state">Failed to load members</div>`;
     toast(friendlyError(err), 'error');
   }
 }
 
-/* -------- ADD/EDIT MEMBER MODAL -------- */
 async function openAddMemberModal() {
   const nextId = await api.nextMemberId(state.gym.id);
   openMemberForm(null, nextId);
@@ -1189,21 +1184,63 @@ async function openAddMemberModal() {
 function openMemberForm(member, presetMemberId) {
   const isEdit = !!member;
   const m = member || {
-    member_id: presetMemberId, name: '', phone: '', email: '', gender: '',
-    dob: '', address: '', joining_date: todayISO(),
-    package_id: '', start_date: todayISO(), end_date: '',
-    amount: 0, paid: 0, emergency_contact: '', notes: '',
+    member_id: presetMemberId, name:'', phone:'', email:'', gender:'',
+    dob:'', address:'', joining_date: todayISO(),
+    package_id:'', start_date: todayISO(), end_date:'',
+    amount:0, paid:0, emergency_contact:'', notes:'',
+    photo_url:'', id_type:'', id_number:'', id_document_url:'',
   };
   const pkgOptions = state.packages.map(p =>
     `<option value="${p.id}" data-dur="${p.duration_months}" data-price="${p.price}"
       ${m.package_id === p.id ? 'selected' : ''}>${escapeHtml(p.name)} — ${money(p.price)} / ${p.duration_months} mo</option>`
   ).join('');
+  const ID_TYPES = ['Aadhaar','PAN','Passport','Driving License','Voter ID','Other'];
 
   openModal({
     title: isEdit ? 'Edit Member' : 'Add Member',
     wide: true,
     body: `
       <form id="memberForm" class="form-grid">
+
+        <div class="kyc-block">
+          <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap">
+            <div style="text-align:center;flex-shrink:0">
+              <div id="photoPreview" class="photo-preview">
+                ${m.photo_url ? `<img src="${escapeHtml(m.photo_url)}" alt="">` : '👤'}
+              </div>
+              <input type="file" id="photoInput" accept="image/*" style="display:none">
+              <button type="button" class="btn btn-secondary btn-sm" id="photoBtn" style="margin-top:8px">Upload Photo</button>
+              ${m.photo_url ? `<button type="button" class="btn btn-danger btn-sm" id="photoRemoveBtn" style="margin-top:4px">Remove</button>` : ''}
+            </div>
+
+            <div style="flex:1;min-width:240px">
+              <label style="font-size:13px;font-weight:600;display:block;margin-bottom:6px">KYC / ID Proof</label>
+              <div class="form-grid" style="grid-template-columns:1fr 1fr;gap:10px">
+                <div class="form-group">
+                  <select name="id_type" id="idTypeSelect">
+                    <option value="">— Select type —</option>
+                    ${ID_TYPES.map(t => `<option value="${t}" ${m.id_type === t ? 'selected' : ''}>${t}</option>`).join('')}
+                  </select>
+                </div>
+                <div class="form-group">
+                  <input name="id_number" value="${escapeHtml(m.id_number || '')}" placeholder="ID number">
+                </div>
+              </div>
+              <input type="file" id="idDocInput" accept="image/*,.pdf" style="display:none">
+              <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                <button type="button" class="btn btn-secondary btn-sm" id="idDocBtn">
+                  ${m.id_document_url ? 'Replace Document' : 'Upload Document'}
+                </button>
+                ${m.id_document_url
+                  ? `<a href="${escapeHtml(m.id_document_url)}" target="_blank" class="btn btn-secondary btn-sm">View</a>
+                     <button type="button" class="btn btn-danger btn-sm" id="idDocRemoveBtn">Remove</button>`
+                  : '<span style="font-size:12px;color:var(--text-muted)">No document uploaded</span>'}
+              </div>
+              <div id="idDocStatus" style="font-size:12px;color:var(--text-muted);margin-top:6px"></div>
+            </div>
+          </div>
+        </div>
+
         <div class="form-group"><label>Member ID</label>
           <input name="member_id" value="${escapeHtml(m.member_id || '')}" readonly style="background:#f9fafb"></div>
         <div class="form-group"><label>Name *</label>
@@ -1228,7 +1265,8 @@ function openMemberForm(member, presetMemberId) {
         <div class="form-group"><label>Joining Date</label>
           <input name="joining_date" type="date" value="${m.joining_date || todayISO()}"></div>
 
-        <div class="form-group full" style="margin-top:6px"><label style="font-size:14px;color:var(--accent)">Membership</label></div>
+        <div class="form-group full" style="margin-top:6px">
+          <label style="font-size:14px;color:var(--accent)">Membership</label></div>
         <div class="form-group"><label>Package</label>
           <select name="package_id" id="pkgSelect">
             <option value="">— No package —</option>
@@ -1244,21 +1282,59 @@ function openMemberForm(member, presetMemberId) {
           <input name="paid" type="number" step="0.01" value="${m.paid || 0}"></div>
         <div class="form-group full"><label>Notes</label>
           <textarea name="notes">${escapeHtml(m.notes || '')}</textarea></div>
-      </form>
-    `,
+      </form>`,
     footer: `
       ${isEdit ? `<button class="btn btn-danger" id="deleteMemberBtn">Delete</button>` : ''}
       <button class="btn btn-secondary" id="cancelMemberBtn">Cancel</button>
-      <button class="btn btn-primary" id="saveMemberBtn">${isEdit ? 'Save Changes' : 'Add Member'}</button>
-    `
+      <button class="btn btn-primary" id="saveMemberBtn">${isEdit ? 'Save Changes' : 'Add Member'}</button>`
   });
 
-  // Auto-calc end date & amount
-  const pkgSelect = $('#pkgSelect');
-  const startDate = $('#startDate');
-  const endDate = $('#endDate');
-  const amountInput = $('#amountInput');
+  let pendingPhotoFile = null;
+  let pendingIdFile = null;
+  let photoRemoved = false;
+  let idDocRemoved = false;
 
+  $('#photoBtn').addEventListener('click', () => $('#photoInput').click());
+  $('#photoInput').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) return toast('Photo must be under 5 MB', 'error');
+    pendingPhotoFile = file; photoRemoved = false;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      $('#photoPreview').innerHTML = `<img src="${ev.target.result}" alt="">`;
+    };
+    reader.readAsDataURL(file);
+  });
+  if ($('#photoRemoveBtn')) {
+    $('#photoRemoveBtn').addEventListener('click', () => {
+      pendingPhotoFile = null; photoRemoved = true;
+      $('#photoPreview').innerHTML = '👤';
+      $('#photoRemoveBtn').remove();
+      toast('Photo will be removed on save', 'info');
+    });
+  }
+
+  $('#idDocBtn').addEventListener('click', () => $('#idDocInput').click());
+  $('#idDocInput').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) return toast('Document must be under 10 MB', 'error');
+    pendingIdFile = file; idDocRemoved = false;
+    $('#idDocStatus').textContent = `✓ ${file.name} (${(file.size/1024).toFixed(0)} KB) — will upload on save`;
+    $('#idDocStatus').style.color = 'var(--accent)';
+  });
+  if ($('#idDocRemoveBtn')) {
+    $('#idDocRemoveBtn').addEventListener('click', () => {
+      pendingIdFile = null; idDocRemoved = true;
+      $('#idDocStatus').textContent = 'Document will be removed on save';
+      $('#idDocStatus').style.color = 'var(--danger)';
+      $('#idDocRemoveBtn').style.display = 'none';
+    });
+  }
+
+  const pkgSelect = $('#pkgSelect'), startDate = $('#startDate'),
+        endDate = $('#endDate'), amountInput = $('#amountInput');
   function recalc() {
     const opt = pkgSelect.selectedOptions[0];
     if (!opt || !opt.value) return;
@@ -1281,6 +1357,8 @@ function openMemberForm(member, presetMemberId) {
     $('#deleteMemberBtn').addEventListener('click', async () => {
       if (!confirm('Delete this member? This will also delete their payments and attendance.')) return;
       try {
+        await storage.remove('member-photos', storage.pathFromUrl(member.photo_url));
+        await storage.remove('member-documents', storage.pathFromUrl(member.id_document_url));
         await api.deleteMember(member.id);
         toast('Member deleted');
         closeModal();
@@ -1292,30 +1370,61 @@ function openMemberForm(member, presetMemberId) {
   $('#saveMemberBtn').addEventListener('click', async () => {
     const btn = $('#saveMemberBtn');
     const data = {};
-    new FormData($('#memberForm')).forEach((v, k) => {
-      data[k] = v === '' ? null : v;
-    });
+    new FormData($('#memberForm')).forEach((v, k) => { data[k] = v === '' ? null : v; });
     if (!data.name) return toast('Name is required', 'error');
     ['amount','paid'].forEach(k => data[k] = parseFloat(data[k]) || 0);
-    ['dob','joining_date','start_date','end_date'].forEach(k => {
-      if (!data[k]) delete data[k];
-    });
+    ['dob','joining_date','start_date','end_date'].forEach(k => { if (!data[k]) delete data[k]; });
     if (!data.package_id) data.package_id = null;
 
     btn.disabled = true;
     btn.innerHTML = '<span class="spinner"></span> Saving...';
+
     try {
+      let memberId = member?.id;
+      if (!isEdit) {
+        const created = await api.createMember(state.gym.id, data);
+        memberId = created.id;
+      }
+
+      // Photo
+      if (pendingPhotoFile) {
+        const oldPath = storage.pathFromUrl(member?.photo_url);
+        if (oldPath) await storage.remove('member-photos', oldPath);
+        const { url } = await storage.upload('member-photos', pendingPhotoFile, state.gym.id, memberId);
+        data.photo_url = url;
+      } else if (photoRemoved) {
+        const oldPath = storage.pathFromUrl(member?.photo_url);
+        if (oldPath) await storage.remove('member-photos', oldPath);
+        data.photo_url = null;
+      }
+
+      // ID doc
+      if (pendingIdFile) {
+        const oldPath = storage.pathFromUrl(member?.id_document_url);
+        if (oldPath) await storage.remove('member-documents', oldPath);
+        const { url } = await storage.upload('member-documents', pendingIdFile, state.gym.id, memberId);
+        data.id_document_url = url;
+      } else if (idDocRemoved) {
+        const oldPath = storage.pathFromUrl(member?.id_document_url);
+        if (oldPath) await storage.remove('member-documents', oldPath);
+        data.id_document_url = null;
+      }
+
       if (isEdit) {
         await api.updateMember(member.id, data);
         toast('Member updated');
       } else {
-        await api.createMember(state.gym.id, data);
+        if (pendingPhotoFile || pendingIdFile || photoRemoved || idDocRemoved) {
+          await api.updateMember(memberId, {
+            photo_url: data.photo_url,
+            id_document_url: data.id_document_url,
+          });
+        }
         toast('Member added');
       }
       closeModal();
       loadMembersTable();
     } catch (err) {
-      console.error(err);
       toast(friendlyError(err), 'error');
       btn.disabled = false;
       btn.textContent = isEdit ? 'Save Changes' : 'Add Member';
@@ -1323,7 +1432,6 @@ function openMemberForm(member, presetMemberId) {
   });
 }
 
-/* -------- MEMBER PROFILE -------- */
 async function openMemberProfile(id) {
   openModal({ title: 'Loading...', body: '<div class="loading-overlay"><span class="spinner" style="border-color:var(--border);border-top-color:var(--accent)"></span> Loading profile...</div>', wide: true, footer: '' });
   try {
@@ -1332,20 +1440,32 @@ async function openMemberProfile(id) {
       api.getPayments(state.gym.id, { memberId: id, limit: 100 }),
       api.getAttendance(state.gym.id, { memberId: id, limit: 60 }),
     ]);
-    state.pendingEditMember = member;
     const pkg = state.packages.find(p => p.id === member.package_id);
     const status = memberStatus(member);
     const remaining = member.end_date ? daysBetween(todayISO(), member.end_date) : 0;
-
-    const wastText = encodeURIComponent(
+    const waPhone = (member.phone || '').replace(/\D/g, '');
+    const waText = encodeURIComponent(
       `Hello ${member.name}, your ${state.settings.gym_name} membership is expiring on ${formatDate(member.end_date)}. Please contact us for renewal. Thank you.`
     );
-    const waPhone = (member.phone || '').replace(/\D/g, '');
+
+    const avatar = member.photo_url
+      ? `<img src="${escapeHtml(member.photo_url)}" alt="">`
+      : '👤';
 
     openModal({
       title: escapeHtml(member.name),
       wide: true,
       body: `
+        <div style="display:flex;gap:18px;align-items:center;margin-bottom:20px">
+          <div class="profile-photo-lg">${avatar}</div>
+          <div>
+            <div style="font-size:20px;font-weight:700">${escapeHtml(member.name)}</div>
+            <div style="color:var(--text-muted);font-size:13px;margin-top:2px">
+              ${escapeHtml(member.member_id || '—')} · ${statusBadge(status)}
+            </div>
+          </div>
+        </div>
+
         <div class="section-title">Personal Information</div>
         <div class="info-grid">
           <div class="info-item"><div class="lbl">Member ID</div><div class="val">${escapeHtml(member.member_id||'—')}</div></div>
@@ -1357,6 +1477,20 @@ async function openMemberProfile(id) {
           <div class="info-item" style="grid-column:1/-1"><div class="lbl">Address</div><div class="val">${escapeHtml(member.address||'—')}</div></div>
           <div class="info-item"><div class="lbl">Emergency Contact</div><div class="val">${escapeHtml(member.emergency_contact||'—')}</div></div>
           <div class="info-item"><div class="lbl">Joining Date</div><div class="val">${formatDate(member.joining_date)}</div></div>
+        </div>
+
+        <div class="section-title">KYC / ID Proof</div>
+        <div class="info-grid">
+          <div class="info-item"><div class="lbl">ID Type</div><div class="val">${escapeHtml(member.id_type||'—')}</div></div>
+          <div class="info-item"><div class="lbl">ID Number</div><div class="val">${escapeHtml(member.id_number||'—')}</div></div>
+          <div class="info-item" style="grid-column:1/-1">
+            <div class="lbl">ID Document</div>
+            <div class="val">
+              ${member.id_document_url
+                ? `<a href="${escapeHtml(member.id_document_url)}" target="_blank" class="btn btn-secondary btn-sm">📄 View Document</a>`
+                : '— Not uploaded'}
+            </div>
+          </div>
         </div>
 
         <div class="section-title">Membership</div>
@@ -1391,17 +1525,14 @@ async function openMemberProfile(id) {
               <td>${formatDate(a.date)}</td>
               <td>${formatTime(a.check_in)}</td>
               <td>${formatTime(a.check_out)}</td>
-            </tr>`).join('')}</tbody></table></div>`}
-      `,
+            </tr>`).join('')}</tbody></table></div>`}`,
       footer: `
         <button class="btn btn-secondary" onclick="openEditMemberFromProfile('${member.id}')">Edit</button>
         <button class="btn btn-secondary" onclick="openRenewModal('${member.id}')">Renew</button>
         <button class="btn btn-primary" onclick="openAddPaymentModal('${member.id}')">+ Add Payment</button>
-        ${waPhone ? `<a class="btn btn-secondary" style="background:#25D366;color:#fff;border:none" href="https://wa.me/${waPhone}?text=${wastText}" target="_blank">WhatsApp</a>` : ''}
-      `,
+        ${waPhone ? `<a class="btn btn-secondary" style="background:#25D366;color:#fff;border:none" href="https://wa.me/${waPhone}?text=${waText}" target="_blank">WhatsApp</a>` : ''}`
     });
   } catch (err) {
-    console.error(err);
     closeModal();
     toast(friendlyError(err), 'error');
   }
@@ -1413,7 +1544,7 @@ async function openEditMemberFromProfile(id) {
 }
 
 /* ============================================================
-   PAGE: ATTENDANCE
+   ATTENDANCE
    ============================================================ */
 async function renderAttendance() {
   $('#pageContent').innerHTML = `
@@ -1430,9 +1561,7 @@ async function renderAttendance() {
       <div class="card-body" style="padding:0" id="attList">
         <div class="loading-overlay"><span class="spinner" style="border-color:var(--border);border-top-color:var(--accent)"></span> Loading...</div>
       </div>
-    </div>
-  `;
-
+    </div>`;
   $('#attDate').addEventListener('change', loadAttendanceTable);
   $('#markAttBtn').addEventListener('click', () => openMarkAttendanceModal());
   loadAttendanceTable();
@@ -1463,10 +1592,8 @@ async function loadAttendanceTable() {
             <td>${!a.check_out ? `<button class="btn btn-secondary btn-sm" onclick="doCheckout('${a.id}')">Check Out</button>` : ''}</td>
           </tr>`).join('')}
         </tbody>
-      </table></div>
-    `;
+      </table></div>`;
   } catch (err) {
-    console.error(err);
     wrap.innerHTML = '<div class="empty-state">Failed to load attendance</div>';
   }
 }
@@ -1480,11 +1607,8 @@ async function doCheckout(attendanceId) {
 }
 
 async function openMarkAttendanceModal() {
-  // Load members for select
   let members = state.membersList;
-  if (!members.length) {
-    members = await api.getMembers(state.gym.id, { limit: 1000 });
-  }
+  if (!members.length) members = await api.getMembers(state.gym.id, { limit: 1000 });
   const activeMembers = members.filter(m => {
     const s = memberStatus(m);
     return s === 'active' || s === 'expiring-soon';
@@ -1497,15 +1621,7 @@ async function openMarkAttendanceModal() {
         <label>Search Member</label>
         <input type="text" id="attModalSearch" placeholder="Type name or phone...">
       </div>
-      <div id="attModalList" style="max-height:340px;overflow-y:auto;margin-top:14px;border:1px solid var(--border);border-radius:8px">
-        ${activeMembers.map(m => `
-          <div class="att-pick" data-id="${m.id}" style="padding:11px 14px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;justify-content:space-between;align-items:center">
-            <div><strong>${escapeHtml(m.name)}</strong><br><span style="font-size:12px;color:var(--text-muted)">${escapeHtml(m.member_id||'')} · ${escapeHtml(m.phone||'')}</span></div>
-            <button class="btn btn-primary btn-sm">Check In</button>
-          </div>
-        `).join('')}
-      </div>
-    `,
+      <div id="attModalList" style="max-height:340px;overflow-y:auto;margin-top:14px;border:1px solid var(--border);border-radius:8px"></div>`,
     footer: `<button class="btn btn-secondary" onclick="closeModal()">Close</button>`
   });
 
@@ -1514,8 +1630,7 @@ async function openMarkAttendanceModal() {
   function renderList(filter = '') {
     const f = filter.toLowerCase();
     const filtered = activeMembers.filter(m =>
-      !f || m.name.toLowerCase().includes(f) || (m.phone||'').includes(f) || (m.member_id||'').toLowerCase().includes(f)
-    );
+      !f || m.name.toLowerCase().includes(f) || (m.phone||'').includes(f) || (m.member_id||'').toLowerCase().includes(f));
     if (filtered.length === 0) {
       list.innerHTML = '<div class="empty-state" style="padding:20px">No matching active members</div>';
       return;
@@ -1524,8 +1639,7 @@ async function openMarkAttendanceModal() {
       <div class="att-pick" data-id="${m.id}" style="padding:11px 14px;border-bottom:1px solid var(--border);cursor:pointer;display:flex;justify-content:space-between;align-items:center">
         <div><strong>${escapeHtml(m.name)}</strong><br><span style="font-size:12px;color:var(--text-muted)">${escapeHtml(m.member_id||'')} · ${escapeHtml(m.phone||'')}</span></div>
         <button class="btn btn-primary btn-sm">Check In</button>
-      </div>
-    `).join('');
+      </div>`).join('');
     bindPick();
   }
   function bindPick() {
@@ -1542,36 +1656,30 @@ async function openMarkAttendanceModal() {
                 closeModal();
                 if (state.currentPage === 'attendance') loadAttendanceTable();
               }
-            } else {
-              toast('Attendance already completed today', 'info');
-            }
+            } else toast('Attendance already completed today', 'info');
             return;
           }
           await api.markAttendance(state.gym.id, id);
           toast('Attendance marked');
           closeModal();
           if (state.currentPage === 'attendance') loadAttendanceTable();
-        } catch (err) {
-          toast(friendlyError(err), 'error');
-        }
+        } catch (err) { toast(friendlyError(err), 'error'); }
       });
     });
   }
   search.addEventListener('input', () => renderList(search.value));
-  bindPick();
+  renderList();
 }
 
 /* ============================================================
-   PAGE: PAYMENTS
+   PAYMENTS
    ============================================================ */
 let paymentsUI = { search: '', from: '', to: '' };
 
 async function renderPayments() {
   $('#topbarActions').innerHTML = `<button class="btn btn-primary" id="addPayBtn">+ Add Payment</button>`;
   $('#addPayBtn').addEventListener('click', () => openAddPaymentModal());
-
-  const monthStart = new Date();
-  monthStart.setDate(1);
+  const monthStart = new Date(); monthStart.setDate(1);
   paymentsUI.from = monthStart.toISOString().split('T')[0];
   paymentsUI.to = todayISO();
 
@@ -1586,8 +1694,7 @@ async function renderPayments() {
       <button class="btn btn-secondary" id="payFilterBtn">Apply</button>
     </div>
     <div class="stats-grid" id="payStats"></div>
-    <div class="card"><div id="paymentsTable"><div class="loading-overlay"><span class="spinner" style="border-color:var(--border);border-top-color:var(--accent)"></span> Loading...</div></div></div>
-  `;
+    <div class="card"><div id="paymentsTable"><div class="loading-overlay"><span class="spinner" style="border-color:var(--border);border-top-color:var(--accent)"></span> Loading...</div></div></div>`;
 
   let debounce;
   $('#paySearch').addEventListener('input', e => {
@@ -1600,7 +1707,6 @@ async function renderPayments() {
     paymentsUI.to = $('#payTo').value;
     loadPaymentsTable();
   });
-
   loadPaymentsTable();
 }
 
@@ -1610,19 +1716,15 @@ async function loadPaymentsTable() {
   wrap.innerHTML = '<div class="loading-overlay"><span class="spinner" style="border-color:var(--border);border-top-color:var(--accent)"></span> Loading...</div>';
   try {
     const list = await api.getPayments(state.gym.id, {
-      from: paymentsUI.from || null,
-      to: paymentsUI.to || null,
-      search: paymentsUI.search,
-      limit: 300,
-    });
+      from: paymentsUI.from || null, to: paymentsUI.to || null,
+      search: paymentsUI.search, limit: 300 });
     const total = list.reduce((s, p) => s + Number(p.amount), 0);
     const cash = list.filter(p => p.method === 'Cash').reduce((s,p)=>s+Number(p.amount),0);
     const online = total - cash;
     $('#payStats').innerHTML = `
       <div class="stat-card"><div class="label">Total Received</div><div class="value green">${money(total)}</div><div class="sub">${list.length} payment${list.length===1?'':'s'}</div></div>
       <div class="stat-card"><div class="label">Cash</div><div class="value">${money(cash)}</div></div>
-      <div class="stat-card"><div class="label">Online / Card / UPI</div><div class="value blue">${money(online)}</div></div>
-    `;
+      <div class="stat-card"><div class="label">Online / Card / UPI</div><div class="value blue">${money(online)}</div></div>`;
 
     if (list.length === 0) {
       wrap.innerHTML = '<div class="empty-state">No payments found</div>';
@@ -1645,10 +1747,8 @@ async function loadPaymentsTable() {
             </td>
           </tr>`).join('')}
         </tbody>
-      </table></div>
-    `;
+      </table></div>`;
   } catch (err) {
-    console.error(err);
     wrap.innerHTML = '<div class="empty-state">Failed to load payments</div>';
   }
 }
@@ -1679,12 +1779,10 @@ async function openAddPaymentModal(preMemberId = null) {
           <input name="transaction_id" placeholder="Optional"></div>
         <div class="form-group full"><label>Notes</label>
           <textarea name="notes" placeholder="Optional"></textarea></div>
-      </form>
-    `,
+      </form>`,
     footer: `
       <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" id="savePayBtn">Save Payment</button>
-    `
+      <button class="btn btn-primary" id="savePayBtn">Save Payment</button>`
   });
 
   $('#savePayBtn').addEventListener('click', async () => {
@@ -1706,7 +1804,6 @@ async function openAddPaymentModal(preMemberId = null) {
       if (state.currentPage === 'members') loadMembersTable();
       if (state.currentPage === 'dashboard') renderDashboard();
     } catch (err) {
-      console.error(err);
       toast(friendlyError(err), 'error');
       btn.disabled = false;
       btn.textContent = 'Save Payment';
@@ -1725,12 +1822,11 @@ async function deletePaymentUI(id) {
 }
 
 /* ============================================================
-   PAGE: PACKAGES (Memberships)
+   PACKAGES
    ============================================================ */
 async function renderPackages() {
   $('#topbarActions').innerHTML = `<button class="btn btn-primary" id="addPkgBtn">+ Add Package</button>`;
   $('#addPkgBtn').addEventListener('click', () => openPackageModal());
-
   try {
     state.packages = await api.getPackages(state.gym.id);
     $('#pageContent').innerHTML = `
@@ -1744,15 +1840,13 @@ async function renderPackages() {
               <button class="btn btn-secondary btn-sm" onclick="editPackage('${p.id}')">Edit</button>
               <button class="btn btn-danger btn-sm" onclick="deletePackageUI('${p.id}')">Delete</button>
             </div>
-          </div>
-        `).join('')}
-      </div>
-    `;
+          </div>`).join('')}
+      </div>`;
   } catch (err) { toast(friendlyError(err), 'error'); }
 }
 
 function openPackageModal(pkg = null) {
-  const p = pkg || { name: '', duration_months: 1, price: 0, description: '' };
+  const p = pkg || { name:'', duration_months:1, price:0, description:'' };
   openModal({
     title: pkg ? 'Edit Package' : 'Add Package',
     body: `
@@ -1765,12 +1859,10 @@ function openPackageModal(pkg = null) {
           <input name="price" type="number" step="0.01" min="0" required value="${p.price}"></div>
         <div class="form-group full"><label>Description</label>
           <textarea name="description">${escapeHtml(p.description||'')}</textarea></div>
-      </form>
-    `,
+      </form>`,
     footer: `
       <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" id="savePkgBtn">Save</button>
-    `
+      <button class="btn btn-primary" id="savePkgBtn">Save</button>`
   });
   $('#savePkgBtn').addEventListener('click', async () => {
     const data = {};
@@ -1801,15 +1893,15 @@ async function deletePackageUI(id) {
 }
 
 /* ============================================================
-   PAGE: EXPIRY
+   EXPIRY
    ============================================================ */
 async function renderExpiry() {
   const buckets = await api.getExpiryBuckets(state.gym.id);
   const sections = [
-    { title: 'Expired', key: 'expired', cls: 'badge-expired' },
-    { title: 'Expiring in 7 Days', key: 'd7', cls: 'badge-soon' },
-    { title: 'Expiring in 15 Days', key: 'd15', cls: 'badge-info' },
-    { title: 'Expiring in 30 Days', key: 'd30', cls: 'badge-gray' },
+    { title:'Expired', key:'expired', cls:'badge-expired' },
+    { title:'Expiring in 7 Days', key:'d7', cls:'badge-soon' },
+    { title:'Expiring in 15 Days', key:'d15', cls:'badge-info' },
+    { title:'Expiring in 30 Days', key:'d30', cls:'badge-gray' },
   ];
   $('#pageContent').innerHTML = sections.map(s => {
     const list = buckets[s.key] || [];
@@ -1817,88 +1909,96 @@ async function renderExpiry() {
       <div class="card" style="margin-bottom:20px">
         <div class="card-header"><h3>${s.title} <span class="badge ${s.cls}">${list.length}</span></h3></div>
         <div class="card-body" style="padding:0">
-          ${list.length === 0
-            ? '<div class="empty-state">None</div>'
-            : `<div class="table-wrap"><table>
-                <thead><tr><th>Member</th><th>Phone</th><th>Package</th><th>Expiry</th><th>Days</th><th>Pending</th><th></th></tr></thead>
-                <tbody>
-                  ${list.map(m => {
-                    const rem = daysBetween(todayISO(), m.end_date);
-                    const waPhone = (m.phone||'').replace(/\D/g,'');
-                    const msg = encodeURIComponent(`Hello ${m.name}, your ${state.settings.gym_name} membership is expiring on ${formatDate(m.end_date)}. Please contact us for renewal. Thank you.`);
-                    return `<tr>
-                      <td><strong>${escapeHtml(m.name)}</strong><br><span style="font-size:12px;color:var(--text-muted)">${escapeHtml(m.member_id||'')}</span></td>
-                      <td>${escapeHtml(m.phone||'—')}</td>
-                      <td>${escapeHtml(m.packages?.name || '—')}</td>
-                      <td>${formatDate(m.end_date)}</td>
-                      <td>${rem < 0 ? `<span class="badge badge-expired">${Math.abs(rem)}d ago</span>` : `<span class="badge badge-info">${rem}d</span>`}</td>
-                      <td>${money(Math.max(0, getPending(m)))}</td>
-                      <td class="actions-cell">
-                        <button class="btn btn-primary btn-sm" onclick="openRenewModal('${m.id}')">Renew</button>
-                        ${waPhone ? `<a class="btn btn-secondary btn-sm" style="background:#25D366;color:#fff;border:none" href="https://wa.me/${waPhone}?text=${msg}" target="_blank">WA</a>` : ''}
-                      </td>
-                    </tr>`;
-                  }).join('')}
-                </tbody></table></div>`}
+          ${list.length === 0 ? '<div class="empty-state">None</div>'
+          : `<div class="table-wrap"><table>
+              <thead><tr><th>Member</th><th>Phone</th><th>Package</th><th>Expiry</th><th>Days</th><th>Pending</th><th></th></tr></thead>
+              <tbody>
+                ${list.map(m => {
+                  const rem = daysBetween(todayISO(), m.end_date);
+                  const waPhone = (m.phone||'').replace(/\D/g,'');
+                  const msg = encodeURIComponent(`Hello ${m.name}, your ${state.settings.gym_name} membership is expiring on ${formatDate(m.end_date)}. Please contact us for renewal. Thank you.`);
+                  return `<tr>
+                    <td><strong>${escapeHtml(m.name)}</strong><br><span style="font-size:12px;color:var(--text-muted)">${escapeHtml(m.member_id||'')}</span></td>
+                    <td>${escapeHtml(m.phone||'—')}</td>
+                    <td>${escapeHtml(m.packages?.name || '—')}</td>
+                    <td>${formatDate(m.end_date)}</td>
+                    <td>${rem < 0 ? `<span class="badge badge-expired">${Math.abs(rem)}d ago</span>` : `<span class="badge badge-info">${rem}d</span>`}</td>
+                    <td>${money(Math.max(0, getPending(m)))}</td>
+                    <td class="actions-cell">
+                      <button class="btn btn-primary btn-sm" onclick="openRenewModal('${m.id}')">Renew</button>
+                      ${waPhone ? `<a class="btn btn-secondary btn-sm" style="background:#25D366;color:#fff;border:none" href="https://wa.me/${waPhone}?text=${msg}" target="_blank">WA</a>` : ''}
+                    </td>
+                  </tr>`;
+                }).join('')}
+              </tbody></table></div>`}
         </div>
-      </div>
-    `;
+      </div>`;
   }).join('');
 }
 
 /* ============================================================
-   PAGE: REPORTS
+   REPORTS (fixed: defaults to All Time)
    ============================================================ */
-let reportsUI = { range: 'month', from: '', to: '' };
-
 async function renderReports() {
   const now = new Date();
-  const fmt = d => d.toISOString().split('T')[0];
-  const monthStart = fmt(new Date(now.getFullYear(), now.getMonth(), 1));
+  const fmt = d => {
+    const p = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
+  };
   const today = fmt(now);
+  const yearStart = fmt(new Date(now.getFullYear(), 0, 1));
 
   $('#pageContent').innerHTML = `
     <div class="toolbar">
       <div class="filter-tabs" id="reportFilters">
         <button data-r="today">Today</button>
-        <button data-r="week">This Week</button>
-        <button data-r="month" class="active">This Month</button>
+        <button data-r="week">Last 7 Days</button>
+        <button data-r="month">This Month</button>
+        <button data-r="year">This Year</button>
+        <button data-r="all" class="active">All Time</button>
         <button data-r="custom">Custom</button>
       </div>
-      <input type="date" id="repFrom" value="${monthStart}" style="padding:10px 12px;border:1px solid var(--border);border-radius:8px">
+      <input type="date" id="repFrom" value="${yearStart}" style="padding:10px 12px;border:1px solid var(--border);border-radius:8px">
       <input type="date" id="repTo" value="${today}" style="padding:10px 12px;border:1px solid var(--border);border-radius:8px">
       <button class="btn btn-secondary" id="repApply">Apply</button>
     </div>
-    <div id="reportBody"><div class="loading-overlay"><span class="spinner" style="border-color:var(--border);border-top-color:var(--accent)"></span> Loading...</div></div>
-  `;
+    <div id="reportBody"><div class="loading-overlay"><span class="spinner" style="border-color:var(--border);border-top-color:var(--accent)"></span> Loading...</div></div>`;
 
-  $('#reportFilters button').forEach(b => b.addEventListener('click', () => {
-    reportsUI.range = b.dataset.r;
-    $$('#reportFilters button').forEach(x => x.classList.toggle('active', x === b));
-    const today = fmt(new Date());
-    if (b.dataset.r === 'today') { $('#repFrom').value = today; $('#repTo').value = today; }
-    else if (b.dataset.r === 'week') {
+  function setRange(r) {
+    const t = fmt(new Date());
+    if (r === 'today') { $('#repFrom').value = t; $('#repTo').value = t; }
+    else if (r === 'week') {
       const wk = new Date(); wk.setDate(wk.getDate() - 7);
-      $('#repFrom').value = fmt(wk); $('#repTo').value = today;
-    } else if (b.dataset.r === 'month') {
-      $('#repFrom').value = monthStart; $('#repTo').value = today;
-    }
-    loadReport();
+      $('#repFrom').value = fmt(wk); $('#repTo').value = t;
+    } else if (r === 'month') {
+      $('#repFrom').value = fmt(new Date(now.getFullYear(), now.getMonth(), 1)); $('#repTo').value = t;
+    } else if (r === 'year') { $('#repFrom').value = yearStart; $('#repTo').value = t; }
+    else if (r === 'all') { $('#repFrom').value = '2000-01-01'; $('#repTo').value = t; }
+  }
+
+  $$('#reportFilters button').forEach(b => b.addEventListener('click', () => {
+    $$('#reportFilters button').forEach(x => x.classList.toggle('active', x === b));
+    if (b.dataset.r !== 'custom') { setRange(b.dataset.r); loadReport(); }
   }));
   $('#repApply').addEventListener('click', loadReport);
+
+  setRange('all');
   loadReport();
 }
 
 async function loadReport() {
-  const from = $('#repFrom').value;
-  const to = $('#repTo').value;
+  const from = $('#repFrom').value || '2000-01-01';
+  const to = $('#repTo').value || todayISO();
+  const body = $('#reportBody');
+  body.innerHTML = '<div class="loading-overlay"><span class="spinner" style="border-color:var(--border);border-top-color:var(--accent)"></span> Loading report...</div>';
+
   try {
     const r = await api.getReport(state.gym.id, from, to);
-    $('#reportBody').innerHTML = `
+    body.innerHTML = `
       <div class="stats-grid">
-        <div class="stat-card"><div class="label">Total Members</div><div class="value">${r.totalMembers}</div></div>
-        <div class="stat-card"><div class="label">Active Members</div><div class="value green">${r.activeMembers}</div></div>
-        <div class="stat-card"><div class="label">Expired Members</div><div class="value red">${r.expiredMembers}</div></div>
+        <div class="stat-card"><div class="label">Total Members</div><div class="value">${r.totalMembers}</div><div class="sub">All time</div></div>
+        <div class="stat-card"><div class="label">Active</div><div class="value green">${r.activeMembers}</div></div>
+        <div class="stat-card"><div class="label">Expired</div><div class="value red">${r.expiredMembers}</div></div>
         <div class="stat-card"><div class="label">New in Period</div><div class="value blue">${r.newMembers}</div><div class="sub">${formatDate(from)} → ${formatDate(to)}</div></div>
         <div class="stat-card"><div class="label">Revenue</div><div class="value green">${money(r.revenue)}</div></div>
         <div class="stat-card"><div class="label">Pending Payments</div><div class="value orange">${money(r.pendingPayments)}</div></div>
@@ -1907,24 +2007,32 @@ async function loadReport() {
       <div class="card">
         <div class="card-header"><h3>Revenue by Payment Method</h3></div>
         <div class="card-body">
-          ${Object.keys(r.byMethod).length === 0 ? '<div style="color:var(--text-muted)">No payments in this period</div>' :
-            `<div class="table-wrap"><table>
-              <thead><tr><th>Method</th><th>Amount</th></tr></thead>
-              <tbody>
-                ${Object.entries(r.byMethod).map(([k,v]) => `<tr><td>${escapeHtml(k)}</td><td><strong>${money(v)}</strong></td></tr>`).join('')}
-              </tbody>
-            </table></div>`}
+          ${Object.keys(r.byMethod).length === 0
+            ? '<div style="color:var(--text-muted);text-align:center;padding:20px">No payments in this period</div>'
+            : `<div class="table-wrap"><table>
+                <thead><tr><th>Method</th><th>Amount</th><th>%</th></tr></thead>
+                <tbody>
+                  ${Object.entries(r.byMethod).sort((a,b)=>b[1]-a[1]).map(([k,v]) => `<tr>
+                    <td>${escapeHtml(k || 'Unknown')}</td>
+                    <td><strong>${money(v)}</strong></td>
+                    <td>${r.revenue ? ((v/r.revenue)*100).toFixed(1) + '%' : '—'}</td>
+                  </tr>`).join('')}
+                </tbody>
+              </table></div>`}
         </div>
-      </div>
-    `;
+      </div>`;
   } catch (err) {
-    console.error(err);
-    $('#reportBody').innerHTML = '<div class="empty-state">Failed to load report</div>';
+    body.innerHTML = `
+      <div class="card"><div class="card-body">
+        <div style="color:var(--danger);font-weight:600;margin-bottom:8px">Report failed to load</div>
+        <div style="color:var(--text-muted);font-size:13px;margin-bottom:12px">${escapeHtml(err.message || 'Unknown error')}</div>
+        <button class="btn btn-secondary btn-sm" onclick="loadReport()">Retry</button>
+      </div></div>`;
   }
 }
 
 /* ============================================================
-   PAGE: SETTINGS
+   SETTINGS
    ============================================================ */
 async function renderSettings() {
   try {
@@ -1957,14 +2065,15 @@ async function renderSettings() {
               <input name="closing_time" type="time" value="${s.closing_time||'22:00'}"></div>
           </form>
           <div style="margin-top:20px;padding-top:20px;border-top:1px solid var(--border);display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between">
-            <div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
               <button class="btn btn-secondary" id="seedDemoBtn">Seed Demo Data</button>
+              <button class="btn btn-secondary" id="downloadAllBtn">⬇ Download All Data (CSV)</button>
+              <button class="btn btn-secondary" id="downloadJsonBtn">⬇ Download Full Backup (JSON)</button>
             </div>
             <button class="btn btn-primary" id="saveSettingsBtn">Save Settings</button>
           </div>
         </div>
-      </div>
-    `;
+      </div>`;
 
     $('#saveSettingsBtn').addEventListener('click', async () => {
       const btn = $('#saveSettingsBtn');
@@ -1988,15 +2097,16 @@ async function renderSettings() {
         const { error } = await sb.rpc('seed_demo_data');
         if (error) throw error;
         toast('Demo data seeded');
-        // Reload app state
         state.packages = await api.getPackages(state.gym.id);
         state.settings = await api.getSettings(state.gym.id);
         navigate('dashboard');
       } catch (err) {
-        console.error(err);
         toast('Could not seed demo data: ' + friendlyError(err), 'error');
       }
     });
+
+    $('#downloadAllBtn').addEventListener('click', downloadAllCSV);
+    $('#downloadJsonBtn').addEventListener('click', downloadFullBackup);
   } catch (err) { toast(friendlyError(err), 'error'); }
 }
 
@@ -2039,12 +2149,10 @@ async function openRenewModal(memberId) {
           <div class="lbl" style="font-size:11px;color:var(--text-muted);text-transform:uppercase;font-weight:600">New Pending Amount</div>
           <div id="renewPendingDisplay" style="font-size:20px;font-weight:700;color:var(--danger);margin-top:4px">${money(0)}</div>
         </div>
-      </form>
-    `,
+      </form>`,
     footer: `
       <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
-      <button class="btn btn-primary" id="renewSubmitBtn">Renew Membership</button>
-    `
+      <button class="btn btn-primary" id="renewSubmitBtn">Renew Membership</button>`
   });
 
   const pkgSel = $('#renewPkgSelect'), startInp = $('#renewStart'), endInp = $('#renewEnd'),
@@ -2086,22 +2194,14 @@ async function openRenewModal(memberId) {
     btn.innerHTML = '<span class="spinner"></span> Processing...';
     try {
       await api.updateMember(member.id, {
-        package_id: newPkgId,
-        start_date: newStart,
-        end_date: newEnd,
-        amount: newAmount,
-        paid: newPay, // Renewal resets paid for new period
-      });
+        package_id: newPkgId, start_date: newStart, end_date: newEnd,
+        amount: newAmount, paid: newPay });
       if (newPay > 0) {
         await sb.from('payments').insert({
-          gym_id: state.gym.id,
-          member_id: member.id,
-          date: todayISO(),
-          amount: newPay,
-          method,
+          gym_id: state.gym.id, member_id: member.id, date: todayISO(),
+          amount: newPay, method,
           package: pkgSel.selectedOptions[0].textContent.split(' — ')[0],
-          notes: 'Renewal',
-        });
+          notes: 'Renewal' });
       }
       toast('Membership renewed');
       closeModal();
@@ -2109,7 +2209,6 @@ async function openRenewModal(memberId) {
       if (state.currentPage === 'expiry') renderExpiry();
       if (state.currentPage === 'dashboard') renderDashboard();
     } catch (err) {
-      console.error(err);
       toast(friendlyError(err), 'error');
       btn.disabled = false;
       btn.textContent = 'Renew Membership';
@@ -2145,19 +2244,17 @@ async function openReceipt(paymentId) {
         <div class="receipt-row total"><span>Amount Paid</span><span>${money(payment.amount)}</span></div>
         <div class="receipt-row"><span>Pending Balance</span><span>${money(pending)}</span></div>
         <div class="thanks">Thank you! 💪<br>Keep training hard.</div>
-      </div>
-    `,
+      </div>`,
     footer: `
       <button class="btn btn-secondary" onclick="closeModal()">Close</button>
-      <button class="btn btn-primary" onclick="window.print()">Print Receipt</button>
-    `
+      <button class="btn btn-primary" onclick="window.print()">Print Receipt</button>`
   });
 }
 
 /* ============================================================
    STARTUP
    ============================================================ */
-sb.auth.onAuthStateChange((event, session) => {
+sb.auth.onAuthStateChange((event) => {
   if (event === 'SIGNED_OUT') {
     state.user = null;
     showLogin();
